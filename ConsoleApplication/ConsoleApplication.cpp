@@ -3,6 +3,6 @@
 
 int main()
 {
-    std::cout << "Début du Projet!\n";
+    std::cout << "Test\n";
 }
 
