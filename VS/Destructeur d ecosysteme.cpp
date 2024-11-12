@@ -10,10 +10,13 @@ using namespace std;
 
 
 int main() {
+<<<<<<< Updated upstream
 	displayMainMenu();
   
   Fish fishManager;
   fishManager.AddFish();
+=======
+    
     SpecieManager fishManager("Poisson");
 
 
