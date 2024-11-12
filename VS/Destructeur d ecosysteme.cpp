@@ -1,13 +1,15 @@
 #include <iostream>
 
 #include "AquaSpecies.cpp"
+#include <cstdlib>
+#include <chrono>
+
 
 using namespace std;
 
+
 int main() {
-    cout << "Hello World!\n";
-    cout << "Hello World!\n";
-    cout << "Hello World!\n";
-    Requin requin1(100, 100);
-    requin1.getInfo();
+	Requin requin1(100,100);
+	Bars bar1(100, 100);
+	bar1.move();
 }
