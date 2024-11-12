@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="animals.cpp" />
     <ClCompile Include="Destructeur d ecosysteme.cpp" />
     <ClCompile Include="Display.cpp" />
     <ClCompile Include="MainMenu.cpp" />
