@@ -1,8 +1,11 @@
+#include "Display.h"
+#include "MainMenu.h"
+
 #include <iostream>
 
 using namespace std;
 
+
 int main() {
-    cout << "Hello World!\n";
-    cout << "Hello World!\n";
+	displayMainMenu();
 }
