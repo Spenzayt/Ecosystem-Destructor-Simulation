@@ -22,10 +22,10 @@ public:
 	int elementNb;
 
 	void isAlive() {
-		cout << "te";
+		
 	}
 	void move() {
-
+		
 	}
 
 };

@@ -1,5 +1,6 @@
 #include <iostream>
-#include "animals.cpp"
+
+#include "AquaSpecies.cpp"
 
 using namespace std;
 
@@ -7,6 +8,6 @@ int main() {
     cout << "Hello World!\n";
     cout << "Hello World!\n";
     cout << "Hello World!\n";
-    Fish fishManager;
-    fishManager.AddFish();
+    Requin requin1(100, 100);
+    requin1.getInfo();
 }
