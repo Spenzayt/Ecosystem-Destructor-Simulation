@@ -20,12 +20,25 @@ class Map
 public:
     Tiles Map[MapSize][MapSize];
     bool lacGeneration = false;
-    int pw = 40;
+    int pw;
+    int dayIndex = 1;
 
-    void AfficherMap();
+    bool Volcano;
+    int PropaIndex;
+
+    bool Flood;
+    int FloodIndex;
+    bool FloodStarted = false;
+
+    bool Earthquake;
+
+    void DisplayMap();
     void InitialiseMap();
     void GenerateWater();
+    void GenerateVolcano();
     void GenerateRessource();
+    void PropagLava();
+    void Flooding();
     void StartGeneration();
     void CheckTiles();
     void NewDay();

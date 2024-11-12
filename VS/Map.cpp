@@ -9,7 +9,8 @@ int const MapSize = 30;
 struct Tiles
 {
 	int Biomes; // Pour le moment si une case est = 0 c'est de l'herbe et si c'est = 1 c'est de l'eau.
-	float Ressource;
+	int Ressource;
+	int nbAnimalIn;
 };
 
 void setColor(int textColor)
@@ -24,10 +25,31 @@ class Map
 public:
 	Tiles Map[30][30];
 	bool lacGeneration = false;
-	int pw = 40;
 
-	void AfficherMap()
+	int pw;
+	int dayIndex = 1;
+
+	bool Volcano;
+	int PropaIndex;
+
+	bool Flood;
+	int FloodIndex;
+	bool FloodStarted = false;
+
+	bool Earthquake;
+
+	void DisplayDay()
 	{
+		cout << "======================" << endl;
+		cout << endl;
+		cout << "       Jour : " << dayIndex << "    " << endl;
+		cout << endl;
+		cout << "======================" << endl;
+	}
+
+	void DisplayMap()
+	{
+		DisplayDay();
 		for (int i = 0; i < MapSize; i++)
 		{
 			cout << endl;
@@ -49,6 +71,16 @@ public:
 					break;
 				case 2:
 					setColor(10);
+					cout << "\xDB""\xDB";
+					setColor(7);
+					break;
+				case 5:
+					setColor(4);
+					cout << "\xDB""\xDB";
+					setColor(7);
+					break;
+				case 6:
+					setColor(8);
 					cout << "\xDB""\xDB";
 					setColor(7);
 					break;
@@ -149,12 +181,70 @@ public:
 		}
 	}
 
+	void GenerateVolcano()
+	{
+		int x = (rand() % MapSize);
+		int y = (rand() % MapSize);
+
+		Map[x][y].Biomes = 5;
+		Map[x][y].Ressource = 0;
+
+		for (int dx = -1; dx <= 1; dx++) {
+			for (int dy = -1; dy <= 1; dy++) {
+				if (dx == 0 && dy == 0)
+					continue;
+
+				int newX = x + dx;
+				int newY = y + dy;
+
+				if (newX >= 0 && newX < MapSize && newY >= 0 && newY < MapSize) {
+					Map[newX][newY].Biomes = 6;
+					Map[newX][newY].Ressource = 0;
+				}
+			}
+		}
+	}
+
+	void PropagLava()
+	{
+		int LavaPropa = (rand() % 10) + 5;
+	}
+
+	void Flooding() // Fonctionne pas pour le moment
+	{
+		int nbFlood = (rand() % 3) + 3;
+
+		if(FloodIndex < nbFlood)
+		{
+			for(int i = 0; i < MapSize; i++)
+			{
+				for(int j = 0; j < MapSize; j++)
+				{
+					if(Map[i][j].Biomes == 1)
+					{
+						i--; 
+						j--;
+					}
+					else
+					{
+						Map[i][j].Biomes = 1;
+					}
+				}
+			}
+		}
+		else
+		{
+			Flood = false;
+		}
+	}
+
 	void StartGeneration()
 	{
 		InitialiseMap();
 		GenerateWater();
 		GenerateRessource();
-		AfficherMap();
+		GenerateVolcano();
+		DisplayMap();
 	}
 
 	void CheckTiles()
@@ -177,17 +267,18 @@ public:
 			break;
 		case 1: cout << "===" << " Biome : Eau                                          " << "===" << endl;
 			break;
-		case 2: cout << "===" << " Biome : Terre riche                                    " << "===" << endl;
+		case 2: cout << "===" << " Biome : Terre riche                                  " << "===" << endl;
 			break;
 		}
 		cout << "===" << " Ressources restantes : " << Map[x][y].Ressource << "                           " << "===" << endl;
 		cout << "============================================================" << endl;
 
-		AfficherMap();
+		DisplayMap();
 	}
 
 	void NewDay()
 	{
+		dayIndex++;
 		for (int i = 0; i < MapSize; i++)
 		{
 			for (int j = 0; j < MapSize; j++)
@@ -195,8 +286,24 @@ public:
 				Map[i][j].Ressource += 5;
 			}
 		}
+
+		if(Volcano)
+		{
+			PropagLava();
+		}
+
+		if(Flood)
+		{
+			if(!FloodStarted)
+			{
+				FloodIndex = 0;
+				FloodStarted = true;
+			}
+			Flooding();
+		}
+
 		system("cls");
-		AfficherMap();
+		DisplayMap();
 	}
 };
 
@@ -210,7 +317,10 @@ void menuTest()
 	cout << endl;
 	cout << "1 - Passer un jour" << endl;
 	cout << "2 - Check une case" << endl;
-	cout << "3 - Quitter" << endl;
+	cout << "3 - Declencher le volcan" << endl;
+	cout << "4 - Declencher une inondation" << endl;
+	cout << "5 - Delencher un seisme" << endl;
+	cout << "6 - Quitter" << endl;
 	cin >> choice;
 
 	switch (choice)
@@ -221,7 +331,17 @@ void menuTest()
 	case 2:
 		map.CheckTiles();
 		break;
-	case 3: End = true;
+	case 3:
+		map.Volcano = true;
+		map.NewDay();
+		break;
+	case 4:
+		map.Flood = true;
+		map.NewDay();
+		break;
+	case 5:
+		break;
+	case 6: End = true; 
 		break;
 	}
 }
