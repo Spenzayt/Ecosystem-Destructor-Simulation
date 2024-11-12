@@ -1,10 +1,7 @@
-#ifndef MAP_LOADER_H
-#define MAP_LOADER_H
+#ifndef MAP_H
+#define MAP_H
 
 #include <iostream>
-#include <cstdlib>
-#include <ctime>
-#include "display_functions.h"
 
 const int MapSize = 30;
 const int MinResource = 20;
@@ -13,7 +10,10 @@ const int MaxResource = 40;
 enum Biome {
     WATER,
     GRASS,
-    RICH_GRASS
+    RICH_GRASS,
+    ROCK,
+    LAVA,
+    FLOODING_WATER,
 };
 
 struct Tile {
@@ -25,7 +25,12 @@ class Map {
 public:
     Tile map[MapSize][MapSize];
 
-    bool lakeGeneration = false;
+    bool lakeGeneration;
+
+    bool isFlooding;
+    int nbFlood;
+    int FloodIndex;
+    bool isUnFlooding;
 
     void defaultMap();
     void displayMap();
@@ -35,13 +40,19 @@ public:
     void generateLakeRadius(int x, int y, int radius);
     void generateLargeWaterBodies();
     void generateResources();
-
+    void generateVolcano();
+    void StartFlooding();
+    void StartUnFlooding();
+    void ContinueFlooding();
     void startGeneration();
     void checkTile();
     void nextDay();
 };
 
+extern Map map;
+extern bool gameOver;
+
+void displayMenu();
 void startGame();
 
-
-#endif
+#endif 
