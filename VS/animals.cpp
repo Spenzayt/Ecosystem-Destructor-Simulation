@@ -1,40 +1,64 @@
 #include <iostream>
+#include <vector>
 using namespace std;
+
+struct Coordinates
+{
+    float x;
+    float y;
+};
+
 
 class Animals {
 private:
-
-	float age = 0;
-	float feed = 100;
-	
+    Coordinates coord;
+    float age;
 
 public :
 
-	
+    Animals()
+    {
+        coord.x = 0; //todo: random
+        coord.y = 0; //todo: random
+        age = 0;
+    }
+    
+    Coordinates getCoord()
+    {
+        return coord;
+    }
+    
+    void SetCoord(float x, float y)
+    {
+        coord.x = x;
+        coord.y = y;
+    }  
 
-	
+    void Delete()
+    {
+        // todo
+    }
 };
 
-
-class Fish :
+class FishManager
 {
 private:
-	int tab_fish[10];
-	void ajouterFish() {
-		Animals fish()
-	}
-	int AgeMaxMax = 100;
-
+	std::vector<Animals> fishList;
 public:
+    void AddFish()
+    {
+    fishList.push_back(Animals());
+    }
 
-};
+    int GetNumberFish()
+    {
+        return 0;// todo
+    }
 
-class Bird : public Specie
-{
-private:
-	int AgeMaxMin = 80;
-	int AgeMaxMax = 100;
+    void GetNumberFishArround(float x, float y, float radius) // todo: radius default = 1
+    {
+        //return the number of fish arround a place, with a radius (by default radius = 1).
+    }
 
-public:
-
+    
 };
