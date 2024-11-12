@@ -129,6 +129,13 @@
   <ItemGroup>
     <ClCompile Include="animals.cpp" />
     <ClCompile Include="Destructeur d ecosysteme.cpp" />
+    <ClCompile Include="Display.cpp" />
+    <ClCompile Include="MainMenu.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Display.h" />
+    <ClInclude Include="Input.h" />
+    <ClInclude Include="MainMenu.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
