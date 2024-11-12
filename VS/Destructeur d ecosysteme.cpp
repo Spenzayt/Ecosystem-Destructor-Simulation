@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include "animals.cpp"
+#include <cstdlib>
+#include <chrono>
 
 using namespace std;
 
@@ -12,4 +14,13 @@ int main() {
   
   Fish fishManager;
   fishManager.AddFish();
+    SpecieManager fishManager("Poisson");
+
+
+    //fishManager.AddAnimal();
+    //fishManager.AddAnimal();
+    //fishManager.ShowCoords();
+    srand(time(NULL));
+    cout << rand() % 10;
+>>>>>>> Stashed changes
 }
