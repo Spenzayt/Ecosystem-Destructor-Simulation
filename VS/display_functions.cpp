@@ -1,43 +1,26 @@
-#include "Display.h"
-
+#include "display_functions.h"
 #include <iostream>
 #include <windows.h>
 
 using namespace std;
 
 
-// Center text in the console
 void centerText(const string text, bool endline, int add) {
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
 	int consoleWidth;
 
-	// Get console width
 	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
 	consoleWidth = csbi.srWindow.Right - csbi.srWindow.Left + 1;
 
-	// Calculate leading spaces
-	int padding = (consoleWidth - (text.length() + add)) / 2;
-	if (padding > 0) {
-		if (endline == true) {
-			cout << string(padding, ' ') << text << endl;
-		}
-		else if (endline == false) {
-			cout << string(padding, ' ') << text;
-		}
-	}
-	else {
-		// If text is longer than console width, print normally
-		if (endline == true) {
-			cout << text << endl;
-		}
-		else if (endline == false) {
-			cout << text << endl;
-		}
+    int padding = (consoleWidth - (text.length() + add)) / 2;
+
+	cout << string(padding > 0 ? padding : 0, ' ') << text;
+	if (endline) {
+		cout << endl;
 	}
 }
 
 
-// Display the "Destructeur d'ecosytemes" title
 void displayTitle() {
 	centerText(" _____                                                                            _____ ", true, 0);
 	centerText("( ___ )                                                                          ( ___ )", true, 0);
@@ -58,10 +41,13 @@ void displayTitle() {
 	centerText("(_____)                                                                          (_____)", true, 0);
 }
 
+
 void clearScreen() {
 	system("cls");
 }
 
-
- 
-
+void setColor(int textColor) {
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	int color = textColor;
+	SetConsoleTextAttribute(hConsole, color);
+}
