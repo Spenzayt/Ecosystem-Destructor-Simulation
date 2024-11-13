@@ -14,6 +14,7 @@ private:
     Coordinates coords;
     float age;
     int foodBar;
+    float direction = 90;
 
 public :
 
@@ -28,12 +29,21 @@ public :
     {
         return coords;
     }
-    
-    void SetCoord(float x, float y)
+    void SetCoords(float x, float y)
     {
         coords.x = x;
         coords.y = y;
-    }  
+    }
+   
+    float GetDirection()
+    {
+        return direction;
+    }
+    void SetDirection(float dir)
+    {
+        direction = dir;
+    }
+
 
 };
 

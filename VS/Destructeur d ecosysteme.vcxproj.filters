@@ -18,8 +18,6 @@
     <ClCompile Include="Destructeur d ecosysteme.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-<<<<<<< Updated upstream
-=======
     <ClCompile Include="Display.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
@@ -49,6 +47,5 @@
     <ClInclude Include="Map.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
->>>>>>> Stashed changes
   </ItemGroup>
 </Project>
