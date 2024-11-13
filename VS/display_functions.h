@@ -9,6 +9,7 @@ void centerText(const string text, bool endline, int add);
 void displayTitle();
 void clearScreen();
 void setColor(int textColor);
+void displayLittleTitle();
 
 
 #endif

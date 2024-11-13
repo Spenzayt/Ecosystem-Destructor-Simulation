@@ -3,6 +3,10 @@
 #include <cstdlib>
 #include <ctime>
 #include <windows.h>
+#include <conio.h>
+#include <vector>
+#include <string>
+
 
 using namespace std;
 
@@ -10,6 +14,16 @@ using namespace std;
 const int MapSize = 30;
 const int MinResource = 20;
 const int MaxResource = 40;
+
+enum class Key {
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT,
+    B,
+    A,
+    OTHER
+};
 
 
 enum Biome {
@@ -39,6 +53,7 @@ public:
 		}
 	}
 
+<<<<<<< Updated upstream
 	void displayMap() {
 		for (int i = 0; i < MapSize; ++i) {
 			cout << endl;
@@ -49,6 +64,30 @@ public:
 			}
 		}
 	}
+=======
+    void defaultMap() {
+        for (int i = 0; i < MapSize; ++i) {
+            for (int j = 0; j < MapSize; ++j) {
+                map[i][j].biome = GRASS;
+                map[i][j].resource = rand() % (MaxResource - MinResource + 1) + MinResource;
+            }
+        }
+    }
+
+    void displayMap() {
+        cout << endl;
+        for (int i = 0; i < MapSize; ++i) {
+            setColorForBiome(map[i][0].biome);
+            centerText("\xDB\xDB", false, MapSize*2);
+            for (int j = 1; j < MapSize; ++j) {
+                setColorForBiome(map[i][j].biome);
+                cout << "\xDB\xDB";
+                setColor(7);
+            }
+            cout << endl;
+        }
+    }
+>>>>>>> Stashed changes
 
 	void setColorForBiome(Biome biome) {
 		switch (biome) {
@@ -167,8 +206,6 @@ public:
                 map[i][j].resource += 5;
             }
         }
-        clearScreen();
-        displayMap();
     }
 };
 
@@ -176,13 +213,109 @@ Map map;
 
 bool gameOver = false;
 
+bool isValidInteger(string value) {
+    if (value.empty()) {
+        cout << "Invalid input! Please enter an integer value." << endl;
+        return false;
+    }
+
+    for (char c : value) {
+        if (!isdigit(c)) {
+            cout << "Invalid input! Please enter an integer value." << endl;
+            return false;
+        }
+    }
+
+    int intValue = stoi(value);
+
+    if (intValue < 0 || intValue > 6) {
+        cout << "Invalid input! Valid coordinates are in range 0 to 6." << endl;
+        return false;
+    }
+
+    return true;
+}
+
+bool konamiCode(const vector<Key>& inputs) {
+    const vector<Key> konamiCode = { Key::UP, Key::UP, Key::DOWN, Key::DOWN, Key::LEFT, Key::RIGHT, Key::LEFT, Key::RIGHT, Key::B, Key::A };
+
+    if (inputs.size() < konamiCode.size()) {
+        return false;
+    }
+
+    for (size_t i = 0; i < konamiCode.size(); ++i) {
+        if (inputs[i] != konamiCode[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void cheat() {
+    vector<Key> inputs;
+
+    while (true) {
+        Key key = Key::OTHER;
+        int input = _getch();
+
+        if (input == 224) {
+            switch (_getch()) {
+            case 72: key = Key::UP; break;
+            case 80: key = Key::DOWN; break;
+            case 75: key = Key::LEFT; break;
+            case 77: key = Key::RIGHT; break;
+            }
+        }
+        else if (input == 'b' || input == 'B') {
+            key = Key::B;
+        }
+        else if (input == 'a' || input == 'A') {
+            key = Key::A;
+        }
+
+        if (key != Key::OTHER) {
+            inputs.push_back(key);
+        }
+
+        if (!konamiCode(inputs)) {
+            cout << "Incorrect sequence. Code cancelled." << endl;
+            break;
+        }
+        else if (inputs.size() == 10) {
+            cout << "Konami Code detected!" << endl;
+            break;
+        }
+    }
+}
+
 void displayMenu() {
     int choice;
-    cout << endl;
+    string input;
+    cout << endl << endl << endl;
     cout << "1 - Pass a day" << endl;
     cout << "2 - Check a tile" << endl;
     cout << "3 - Quit" << endl;
+<<<<<<< Updated upstream
     cin >> choice;
+=======
+    cout << "Temporary Command : " << endl;
+    cout << "4 - Flood map" << endl;
+    cout << "5 - Wake volcano (not working)" << endl;
+    cout << "6 - Earthquake (not working)" << endl;
+
+    while (true) {
+        cin >> input;
+        if (input == "cheat") {
+            cheat();
+        }
+        else {
+            if (isValidInteger(input)) {
+                choice = stoi(input);
+                break;
+            }
+        }
+    }
+>>>>>>> Stashed changes
 
     switch (choice) {
     case 1:
@@ -204,6 +337,9 @@ void startGame() {
     map.startGeneration();
 
     while (!gameOver) {
+        clearScreen();
+        displayLittleTitle();
+        map.displayMap();
         displayMenu();
     }
 }
