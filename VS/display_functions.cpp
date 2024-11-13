@@ -4,11 +4,10 @@
 
 using namespace std;
 
-
 void centerText(const string text, bool endline, int add) {
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
 	int consoleWidth;
-
+  
 	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
 	consoleWidth = csbi.srWindow.Right - csbi.srWindow.Left + 1;
 
@@ -19,7 +18,6 @@ void centerText(const string text, bool endline, int add) {
 		cout << endl;
 	}
 }
-
 
 void displayTitle() {
 	centerText(" _____                                                                            _____ ", true, 0);
@@ -40,7 +38,6 @@ void displayTitle() {
 	centerText(" |___|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|___| ", true, 0);
 	centerText("(_____)                                                                          (_____)", true, 0);
 }
-
 
 void clearScreen() {
 	system("cls");
