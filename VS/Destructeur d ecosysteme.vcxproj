@@ -129,16 +129,15 @@
   <ItemGroup>
     <ClCompile Include="animals.cpp" />
     <ClCompile Include="AquaSpecies.cpp" />
-    <ClCompile Include="Destructeur d ecosysteme.cpp" />
-    <ClCompile Include="Display.cpp" />
-    <ClCompile Include="MainMenu.cpp" />
-    <ClCompile Include="Map.cpp" />
+    <ClCompile Include="display_functions.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="main_menu.cpp" />
+    <ClCompile Include="map_loader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Display.h" />
-    <ClInclude Include="Map.h" />
-    <ClInclude Include="Input.h" />
-    <ClInclude Include="MainMenu.h" />
+    <ClInclude Include="display_functions.h" />
+    <ClInclude Include="main_menu.h" />
+    <ClInclude Include="map_loader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

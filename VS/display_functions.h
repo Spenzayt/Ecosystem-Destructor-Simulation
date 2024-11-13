@@ -4,9 +4,11 @@
 #include <iostream>
 using namespace std;
 
+
 void centerText(const string text, bool endline, int add);
 void displayTitle();
 void clearScreen();
 void setColor(int textColor);
+
 
 #endif
