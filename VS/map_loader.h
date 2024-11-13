@@ -2,51 +2,57 @@
 #define MAP_H
 
 #include <iostream>
-#include <cstdlib>
-#include <windows.h>
-
-using namespace std;
 
 const int MapSize = 30;
+const int MinResource = 20;
+const int MaxResource = 40;
 
-struct Tiles
-{
-    int Biomes;
-    float Ressource;
+enum Biome {
+    WATER,
+    GRASS,
+    RICH_GRASS,
+    ROCK,
+    LAVA,
+    FLOODING_WATER,
 };
 
-class Map
-{
+struct Tile {
+    Biome biome;
+    float resource;
+};
+
+class Map {
 public:
-    Tiles Map[MapSize][MapSize];
-    bool lacGeneration = false;
-    int pw;
-    int dayIndex = 1;
+    Tile map[MapSize][MapSize];
 
-    bool Volcano;
-    int PropaIndex;
+    bool lakeGeneration;
 
-    bool Flood;
+    bool isFlooding;
+    int nbFlood;
     int FloodIndex;
-    bool FloodStarted = false;
+    bool isUnFlooding;
 
-    bool Earthquake;
-
-    void DisplayMap();
-    void InitialiseMap();
-    void GenerateWater();
-    void GenerateVolcano();
-    void GenerateRessource();
-    void PropagLava();
-    void Flooding();
-    void StartGeneration();
-    void CheckTiles();
-    void NewDay();
+    void defaultMap();
+    void displayMap();
+    void setColorForBiome(Biome biome);
+    void generateWater();
+    void generateLakes(int numLakes);
+    void generateLakeRadius(int x, int y, int radius);
+    void generateLargeWaterBodies();
+    void generateResources();
+    void generateVolcano();
+    void StartFlooding();
+    void StartUnFlooding();
+    void ContinueFlooding();
+    void startGeneration();
+    void checkTile();
+    void nextDay();
 };
 
 extern Map map;
+extern bool gameOver;
 
-void menuTest();
-void startMap();
+void displayMenu();
+void startGame();
 
-#endif // MAP_H
+#endif 

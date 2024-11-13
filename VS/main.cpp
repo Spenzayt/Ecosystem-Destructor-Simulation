@@ -1,19 +1,11 @@
-#include "Display.h"
-#include "MainMenu.h"
-#include "Map.h"
-#include "animals.cpp"
-
-#include <iostream>
-#include <cstdlib>
-#include <ctime>
-
-using namespace std;
+#include "main_menu.h"
 
 
 int main() {
-	//displayMainMenu();
-  
-	//Fish fishManager;
-	//fishManager.AddFish();
-	startMap();
+    int result = displayMainMenu();
+
+    if (result == EXIT) {
+        return 0;
+    }
+    return 0;
 }
