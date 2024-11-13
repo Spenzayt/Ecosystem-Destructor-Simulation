@@ -12,14 +12,13 @@ void centerText(const string text, bool endline, int add) {
 	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
 	consoleWidth = csbi.srWindow.Right - csbi.srWindow.Left + 1;
 
-    int padding = (consoleWidth - (text.length() + add)) / 2;
+	int padding = (consoleWidth - (text.length() + add)) / 2;
 
 	cout << string(padding > 0 ? padding : 0, ' ') << text;
 	if (endline) {
 		cout << endl;
 	}
 }
-
 
 void displayTitle() {
 	centerText(" _____                                                                            _____ ", true, 0);

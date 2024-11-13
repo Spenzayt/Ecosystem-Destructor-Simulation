@@ -6,9 +6,9 @@
 using namespace std;
 class Gobie : public Animals
 {
-public : 
-	
-	
+public:
+
+
 };
 class Bars :public Animals
 {
@@ -40,11 +40,11 @@ public:
 	bool alive = true;
 	int elementNb;
 
-	Requin(int a, int e) : age(a), elementNb(e){
+	Requin(int a, int e) : age(a), elementNb(e) {
 		srand(time(NULL));
 		int food = rand() % 100;
-		
-		cout << "la nouriture est initialisée à "<<food;
+
+		cout << "la nouriture est initialisée à " << food;
 		return;
 	}
 	~Requin() {

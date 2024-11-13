@@ -27,32 +27,33 @@ enum class Key {
 
 
 enum Biome {
-	WATER,
-	GRASS,
-	RICH_GRASS
+    WATER,
+    GRASS,
+    RICH_GRASS,
+    ROCK,
+    LAVA,
+    FLOODING_WATER,
 };
 
 
 struct Tile {
-	Biome biome;
-	float resource;
+    Biome biome;
+    float resource;
 };
 
 
 class Map {
 public:
-	Tile map[MapSize][MapSize];
-	bool lakeGeneration = false;
+    Tile map[MapSize][MapSize];
+    bool lakeGeneration = false;
 
-	void defaultMap() {
-		for (int i = 0; i < MapSize; ++i) {
-			for (int j = 0; j < MapSize; ++j) {
-				map[i][j].biome = GRASS;
-				map[i][j].resource = rand() % (MaxResource - MinResource + 1) + MinResource;
-			}
-		}
-	}
+    // Flooding related variables.
+    bool isFlooding = false;
+    int nbFlood;
+    int FloodIndex = 0;
+    bool isUnFlooding = false;
 
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 	void displayMap() {
 		for (int i = 0; i < MapSize; ++i) {
@@ -88,20 +89,50 @@ public:
         }
     }
 >>>>>>> Stashed changes
+=======
+    void defaultMap() {
+        for (int i = 0; i < MapSize; ++i) {
+            for (int j = 0; j < MapSize; ++j) {
+                map[i][j].biome = GRASS;
+                map[i][j].resource = rand() % (MaxResource - MinResource + 1) + MinResource;
+            }
+        }
+    }
 
-	void setColorForBiome(Biome biome) {
-		switch (biome) {
-		case WATER:
-			setColor(3);  // Blue
-			break;
-		case GRASS:
-			setColor(2);  // Green
-			break;
-		case RICH_GRASS:
-			setColor(10); // Light Green
-			break;
-		}
-	}
+    void displayMap() {
+        for (int i = 0; i < MapSize; ++i) {
+            cout << endl;
+            for (int j = 0; j < MapSize; ++j) {
+                setColorForBiome(map[i][j].biome);
+                cout << "\xDB\xDB";
+                setColor(7);
+            }
+        }
+    }
+>>>>>>> d9f656911a4e8a6da193a06471d49ce8dc7dbb28
+
+    void setColorForBiome(Biome biome) {
+        switch (biome) {
+        case WATER:
+            setColor(3);  // Blue
+            break;
+        case GRASS:
+            setColor(2);  // Green
+            break;
+        case RICH_GRASS:
+            setColor(10); // Light Green
+            break;
+        case ROCK:
+            setColor(8); // Grey
+            break;
+        case LAVA:
+            setColor(4); // Red
+            break;
+        case FLOODING_WATER:
+            setColor(3);
+            break;
+        }
+    }
 
     void generateWater() {
         int numLakes = rand() % 10 + 5;
@@ -167,10 +198,62 @@ public:
         }
     }
 
+    void generateVolcano() {
+        int x = (rand() % MapSize);
+        int y = (rand() % MapSize);
+        map[x][y].biome = LAVA;
+        map[x][y].resource = 0;
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                if (dx == 0 && dy == 0)
+                    continue;
+                int newX = x + dx;
+                int newY = y + dy;
+                if (newX >= 0 && newX < MapSize && newY >= 0 && newY < MapSize) {
+                    map[newX][newY].biome = ROCK;
+                    map[newX][newY].resource = 0;
+                }
+            }
+        }
+    }
+
+    void StartFlooding() // Fonctionne pas pour le moment
+    {
+        nbFlood = (rand() % 3) + 2;
+        FloodIndex = 0;
+        isFlooding = true;
+    }
+
+    void StartUnFlooding() {
+        isUnFlooding = true;
+    }
+
+    void ContinueFlooding() {
+        int nbFloodedTiles = 40;
+        if (FloodIndex < nbFlood) {
+            for (int i = 0; i < nbFloodedTiles; i++) {
+                int x = (rand() % MapSize);
+                int y = (rand() % MapSize);
+                if (map[x][y].biome != WATER && map[x][y].biome != ROCK && map[x][y].biome != LAVA && map[x][y].biome != FLOODING_WATER) {
+                    map[x][y].biome = FLOODING_WATER;
+                    map[x][y].resource /= 2;
+                }
+                else {
+                    i--;
+                }
+            }
+        }
+        else {
+            isFlooding = false;
+        }
+        FloodIndex++;
+    }
+
     void startGeneration() {
         defaultMap();
         generateWater();
         generateResources();
+        generateVolcano();
         displayMap();
     }
 
@@ -189,6 +272,9 @@ public:
         case WATER:
             cout << "Biome: Water" << endl;
             break;
+        case FLOODING_WATER:
+            cout << "Biome: Water" << endl;
+            break;
         case GRASS:
             cout << "Biome: Grass" << endl;
             break;
@@ -201,6 +287,10 @@ public:
     }
 
     void nextDay() {
+
+        if (isFlooding) {
+            ContinueFlooding();
+        }
         for (int i = 0; i < MapSize; ++i) {
             for (int j = 0; j < MapSize; ++j) {
                 map[i][j].resource += 5;
@@ -295,7 +385,14 @@ void displayMenu() {
     cout << "1 - Pass a day" << endl;
     cout << "2 - Check a tile" << endl;
     cout << "3 - Quit" << endl;
+<<<<<<< HEAD
 <<<<<<< Updated upstream
+=======
+    cout << "Temporary Command : " << endl;
+    cout << "4 - Flood map" << endl;
+    cout << "5 - Wake volcano (not working)" << endl;
+    cout << "6 - Earthquake (not working" << endl;
+>>>>>>> d9f656911a4e8a6da193a06471d49ce8dc7dbb28
     cin >> choice;
 =======
     cout << "Temporary Command : " << endl;
@@ -326,6 +423,14 @@ void displayMenu() {
         break;
     case 3:
         gameOver = true;
+        break;
+    case 4:
+        map.StartFlooding();
+        map.nextDay();
+        break;
+
+
+    default:
         break;
     }
 }
