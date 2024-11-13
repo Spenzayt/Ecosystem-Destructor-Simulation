@@ -11,11 +11,12 @@ struct Coordinates
 
 class Animals {
 private:
+    
+
+public :
     Coordinates coords;
     float age;
     int foodBar;
-
-public :
 
     Animals()
     {

@@ -24,6 +24,7 @@ struct Tile {
 class Map {
 public:
     Tile map[MapSize][MapSize];
+    Tile(*getMap())[MapSize];
 
     bool lakeGeneration;
 

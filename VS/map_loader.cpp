@@ -33,6 +33,10 @@ public:
     Tile map[MapSize][MapSize];
     bool lakeGeneration = false;
 
+    Tile (*getMap())[MapSize]{
+    return map;
+    }
+
     // Flooding related variables.
     bool isFlooding = false;
     int nbFlood;
@@ -291,6 +295,7 @@ void startGame() {
     clearScreen();
     srand((unsigned)time(NULL));
     map.startGeneration();
+
 
     while (!gameOver) {
         displayMenu();
