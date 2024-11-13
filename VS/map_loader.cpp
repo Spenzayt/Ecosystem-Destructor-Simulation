@@ -1,4 +1,4 @@
-#include "display_functions.h"
+﻿#include "display_functions.h"
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
@@ -25,6 +25,7 @@ enum Biome {
 struct Tile {
     Biome biome;
     float resource;
+    bool AnimalIn;
 };
 
 
@@ -44,6 +45,7 @@ public:
             for (int j = 0; j < MapSize; ++j) {
                 map[i][j].biome = GRASS;
                 map[i][j].resource = rand() % (MaxResource - MinResource + 1) + MinResource;
+                map[i][j].AnimalIn = false;
             }
         }
     }
@@ -53,33 +55,46 @@ public:
             cout << endl;
             for (int j = 0; j < MapSize; ++j) {
                 setColorForBiome(map[i][j].biome);
-                cout << "\xDB\xDB";
-                setColor(7);
+                if (map[i][j].AnimalIn) {
+                    setColorText(0);
+                    cout << "0 ";
+                }
+                else {
+                    cout << "  ";
+                }
             }
+            setColorBg(0);
         }
+        setColorText(7);
     }
 
     void setColorForBiome(Biome biome) {
+        int bgColor; 
+
         switch (biome) {
         case WATER:
-            setColor(3);  // Blue
+            bgColor = 3; // Blue
             break;
         case GRASS:
-            setColor(2);  // Green
+            bgColor = 2;  //Green
             break;
         case RICH_GRASS:
-            setColor(10); // Light Green
+            bgColor = 10; // Light Green
             break;
         case ROCK:
-            setColor(8); // Grey
+            bgColor = 8;  // Grey
             break;
         case LAVA:
-            setColor(4); // Red
+            bgColor = 4;  // Red
             break;
         case FLOODING_WATER:
-            setColor(3);
+            bgColor = 3;
+            break;
+        default:
+            bgColor = 0;
             break;
         }
+        setColorBg(bgColor);
     }
 
     void generateWater() {
@@ -197,11 +212,20 @@ public:
         FloodIndex++;
     }
 
+    void SpawnTest()
+    {
+        int x = (rand() % MapSize);
+        int y = (rand() % MapSize);
+
+        map[x][y].AnimalIn = true;
+    }
+
     void startGeneration() {
         defaultMap();
         generateWater();
         generateResources();
         generateVolcano();
+        SpawnTest();
         displayMap();
     }
 

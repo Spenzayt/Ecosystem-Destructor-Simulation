@@ -45,8 +45,18 @@ void clearScreen() {
 	system("cls");
 }
 
-void setColor(int textColor) {
+void setColorText(int textColor) {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	int color = textColor;
+	CONSOLE_SCREEN_BUFFER_INFO csbi;
+	GetConsoleScreenBufferInfo(hConsole, &csbi);
+	int color = (csbi.wAttributes & 0xF0) | textColor; // On conserve la couleur de fond actuelle
+	SetConsoleTextAttribute(hConsole, color);
+}
+
+void setColorBg(int bgColor) {
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_SCREEN_BUFFER_INFO csbi;
+	GetConsoleScreenBufferInfo(hConsole, &csbi);
+	int color = (csbi.wAttributes & 0x0F) | (bgColor << 4); // On conserve la couleur du texte actuelle
 	SetConsoleTextAttribute(hConsole, color);
 }
