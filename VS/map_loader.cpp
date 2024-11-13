@@ -19,12 +19,13 @@ enum Biome {
     ROCK,
     LAVA,
     FLOODING_WATER,
+    VOLCANO_LAVA,
 };
 
 
 struct Tile {
     Biome biome;
-    float resource;
+    int resource;
     bool AnimalIn;
 };
 
@@ -39,6 +40,13 @@ public:
     int nbFlood;
     int FloodIndex = 0;
     bool isUnFlooding = false;
+
+    //Volcano related variables.
+    int volcanoX, volcanoY;
+    int lavaRadius = 1;
+    int lavaDays = 0;
+    bool isErupting = false;
+
 
     void defaultMap() {
         for (int i = 0; i < MapSize; ++i) {
@@ -90,6 +98,9 @@ public:
         case FLOODING_WATER:
             bgColor = 3;
             break;
+        case VOLCANO_LAVA:
+            bgColor = 4;
+                break;
         default:
             bgColor = 0;
             break;
@@ -162,16 +173,16 @@ public:
     }
 
     void generateVolcano() {
-        int x = (rand() % MapSize);
-        int y = (rand() % MapSize);
-        map[x][y].biome = LAVA;
-        map[x][y].resource = 0;
+        volcanoX = (rand() % MapSize);
+        volcanoY = (rand() % MapSize);
+        map[volcanoX][volcanoY].biome = VOLCANO_LAVA;
+        map[volcanoX][volcanoY].resource = 0;
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
                 if (dx == 0 && dy == 0)
                     continue;
-                int newX = x + dx;
-                int newY = y + dy;
+                int newX = volcanoX + dx;
+                int newY = volcanoY + dy;
                 if (newX >= 0 && newX < MapSize && newY >= 0 && newY < MapSize) {
                     map[newX][newY].biome = ROCK;
                     map[newX][newY].resource = 0;
@@ -189,6 +200,7 @@ public:
 
     void StartUnFlooding() {
         isUnFlooding = true;
+        FloodIndex = 0;
     }
 
     void ContinueFlooding() {
@@ -208,8 +220,81 @@ public:
         }
         else {
             isFlooding = false;
+            StartUnFlooding();
         }
         FloodIndex++;
+    }
+
+    void ContinueUnFlooding() {
+        FloodIndex++;
+        if (FloodIndex > 4) {
+            for (int i = 0; i < MapSize; i++) {
+                for (int j = 0; j < MapSize; j++) {
+                    if (map[i][j].biome == FLOODING_WATER) {
+                        if (rand() % 4 == 1) {
+                            map[i][j].biome = GRASS;
+                        }
+                    }
+                }
+            }
+        }
+        else if (FloodIndex > 10) {
+            for (int i = 0; i < MapSize; i++) {
+                for (int j = 0; j < MapSize; j++) {
+                    if (map[i][j].biome == FLOODING_WATER) {
+                        map[i][j].biome = GRASS;
+                        FloodIndex = 0;
+                        isUnFlooding = false;
+                    }
+                }
+            }
+        }
+    }
+
+    void StartEruption() {
+        isErupting = true;
+        lavaRadius = 1;
+        lavaDays = 0;
+    }
+
+    void PropagateLava() {
+        if (!isErupting) return; 
+        lavaDays++;
+        for (int i = -lavaRadius; i <= lavaRadius; ++i) {
+            for (int j = -lavaRadius; j <= lavaRadius; ++j) {
+                int newX = volcanoX + i;
+                int newY = volcanoY + j;
+                if (newX >= 0 && newX < MapSize && newY >= 0 && newY < MapSize) {
+                    if (map[newX][newY].biome != ROCK && map[newX][newY].biome != LAVA && map[newX][newY].biome != VOLCANO_LAVA) {
+                        map[newX][newY].biome = LAVA;
+                        map[newX][newY].resource = 0;
+                    }
+                }
+            }
+        }
+        lavaRadius++;
+        if (lavaRadius > 15) {
+            lavaRadius = 15;
+        }
+    }
+
+    void LavaToRock() {
+        if (!isErupting || lavaDays < 4) return;
+
+        for (int i = -lavaRadius; i <= lavaRadius; ++i) {
+            for (int j = -lavaRadius; j <= lavaRadius; ++j) {
+                int newX = volcanoX + i;
+                int newY = volcanoY + j;
+                if (newX >= 0 && newX < MapSize && newY >= 0 && newY < MapSize) {
+                    if (map[newX][newY].biome == LAVA) {
+                        map[newX][newY].biome = ROCK;
+                    }
+                }
+            }
+        }
+        isErupting = false;
+        lavaRadius = 1;
+        lavaDays = 0;
     }
 
     void SpawnTest()
@@ -263,6 +348,13 @@ public:
         if (isFlooding) {
             ContinueFlooding();
         }
+        if (isUnFlooding) {
+            ContinueUnFlooding();
+        }
+        if (isErupting) {
+            PropagateLava();
+            LavaToRock();
+        }
         for (int i = 0; i < MapSize; ++i) {
             for (int j = 0; j < MapSize; ++j) {
                 map[i][j].resource += 5;
@@ -270,6 +362,7 @@ public:
         }
         clearScreen();
         displayMap();
+        cout << endl << FloodIndex << endl;
     }
 };
 
@@ -303,8 +396,10 @@ void displayMenu() {
         map.StartFlooding();
         map.nextDay();
         break;
-
-
+    case 5:
+        map.StartEruption();
+        map.nextDay();
+        break;
     default:
         break;
     }
