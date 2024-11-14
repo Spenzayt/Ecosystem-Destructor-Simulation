@@ -11,5 +11,4 @@ void clearScreen();
 void setColor(int textColor);
 void displayLittleTitle();
 
-
 #endif

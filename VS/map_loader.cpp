@@ -6,6 +6,8 @@
 #include <conio.h>
 #include <vector>
 #include <string>
+#include <thread>
+#include <chrono>
 
 
 using namespace std;
@@ -14,16 +16,6 @@ using namespace std;
 const int MapSize = 30;
 const int MinResource = 20;
 const int MaxResource = 40;
-
-enum class Key {
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT,
-    B,
-    A,
-    OTHER
-};
 
 
 enum Biome {
@@ -44,6 +36,7 @@ struct Tile {
 
 class Map {
 public:
+    int days = 1;
     Tile map[MapSize][MapSize];
     bool lakeGeneration = false;
 
@@ -53,19 +46,6 @@ public:
     int FloodIndex = 0;
     bool isUnFlooding = false;
 
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-	void displayMap() {
-		for (int i = 0; i < MapSize; ++i) {
-			cout << endl;
-			for (int j = 0; j < MapSize; ++j) {
-				setColorForBiome(map[i][j].biome);
-				cout << "\xDB\xDB";
-                setColor(7);
-			}
-		}
-	}
-=======
     void defaultMap() {
         for (int i = 0; i < MapSize; ++i) {
             for (int j = 0; j < MapSize; ++j) {
@@ -79,7 +59,7 @@ public:
         cout << endl;
         for (int i = 0; i < MapSize; ++i) {
             setColorForBiome(map[i][0].biome);
-            centerText("\xDB\xDB", false, MapSize*2);
+            centerText("\xDB\xDB", false, MapSize * 2);
             for (int j = 1; j < MapSize; ++j) {
                 setColorForBiome(map[i][j].biome);
                 cout << "\xDB\xDB";
@@ -88,28 +68,6 @@ public:
             cout << endl;
         }
     }
->>>>>>> Stashed changes
-=======
-    void defaultMap() {
-        for (int i = 0; i < MapSize; ++i) {
-            for (int j = 0; j < MapSize; ++j) {
-                map[i][j].biome = GRASS;
-                map[i][j].resource = rand() % (MaxResource - MinResource + 1) + MinResource;
-            }
-        }
-    }
-
-    void displayMap() {
-        for (int i = 0; i < MapSize; ++i) {
-            cout << endl;
-            for (int j = 0; j < MapSize; ++j) {
-                setColorForBiome(map[i][j].biome);
-                cout << "\xDB\xDB";
-                setColor(7);
-            }
-        }
-    }
->>>>>>> d9f656911a4e8a6da193a06471d49ce8dc7dbb28
 
     void setColorForBiome(Biome biome) {
         switch (biome) {
@@ -287,14 +245,50 @@ public:
     }
 
     void nextDay() {
+        int daysToPass = 1;
 
-        if (isFlooding) {
-            ContinueFlooding();
-        }
-        for (int i = 0; i < MapSize; ++i) {
-            for (int j = 0; j < MapSize; ++j) {
-                map[i][j].resource += 5;
+        while (true) {
+            clearScreen();
+            displayLittleTitle();
+            displayMap();
+            cout << "How many days do you want to pass ?" << endl;
+            cout << "Day to pass -> " << daysToPass;
+
+            char input = _getch();
+
+            if (input == 'z' || input == 'Z') {
+                daysToPass++;
             }
+            else if (input == 's' || input == 'S') {
+                daysToPass--;
+            }
+            else if (input == 72) {
+                daysToPass++;
+            }
+            else if (input == 80) {
+                daysToPass--;
+            }
+            else if (input == 13) {
+                break;
+            }
+        }
+
+        for (int day = 0; day < daysToPass; day++) {
+            if (isFlooding) {
+                ContinueFlooding();
+            }
+            for (int i = 0; i < MapSize; ++i) {
+                for (int j = 0; j < MapSize; ++j) {
+                    map[i][j].resource += 5;
+                }
+            }
+            days++;
+            clearScreen();
+            displayLittleTitle();
+            displayMap();
+            cout << endl << endl << endl;
+            centerText(to_string(day) + " days pass", true, 0);
+            this_thread::sleep_for(chrono::seconds(2));
         }
     }
 };
@@ -303,135 +297,126 @@ Map map;
 
 bool gameOver = false;
 
-bool isValidInteger(string value) {
-    if (value.empty()) {
-        cout << "Invalid input! Please enter an integer value." << endl;
-        return false;
-    }
+enum Key {
+    INVALID = -1, UP, DOWN, LEFT, RIGHT, SPACE = 32, ENTER = 13, Z = 'z', S = 's', A = 'a', B = 'b'
+};
 
-    for (char c : value) {
-        if (!isdigit(c)) {
-            cout << "Invalid input! Please enter an integer value." << endl;
-            return false;
+Key getKeyInput() {
+    int ch = _getch();
+
+    if (ch == 0 || ch == 224) {
+        ch = _getch();
+        switch (ch) {
+        case 72: return UP;
+        case 80: return DOWN;
+        case 77: return RIGHT;
+        case 75: return LEFT;
         }
     }
 
-    int intValue = stoi(value);
+    if (ch == ' ') return SPACE;
+    if (ch == ENTER) return ENTER;
+    if (ch == 'z' || ch == 'Z') return Z;
+    if (ch == 's' || ch == 'S') return S;
+    if (ch == 'b' || ch == 'B') return B;
+    if (ch == 'a' || ch == 'A') return A;
 
-    if (intValue < 0 || intValue > 6) {
-        cout << "Invalid input! Valid coordinates are in range 0 to 6." << endl;
-        return false;
-    }
-
-    return true;
+    return INVALID;
 }
 
-bool konamiCode(const vector<Key>& inputs) {
-    const vector<Key> konamiCode = { Key::UP, Key::UP, Key::DOWN, Key::DOWN, Key::LEFT, Key::RIGHT, Key::LEFT, Key::RIGHT, Key::B, Key::A };
-
+bool checkKonamiCode(const vector<Key>& inputs) {
+    const vector<Key> konamiCode = { UP, UP, DOWN, DOWN, LEFT, RIGHT, LEFT, RIGHT, B, A };
     if (inputs.size() < konamiCode.size()) {
         return false;
     }
 
     for (size_t i = 0; i < konamiCode.size(); ++i) {
-        if (inputs[i] != konamiCode[i]) {
+        if (inputs[inputs.size() - konamiCode.size() + i] != konamiCode[i]) {
             return false;
         }
     }
     return true;
 }
 
-void cheat() {
+
+void displayGameMenuOptions(const int choice, bool konamiCodeActivated) {
+    clearScreen();
+    displayLittleTitle();
+    map.displayMap();
+
+    cout << endl << endl;
+    centerText("Day " + to_string(map.days), true, 0);
+    centerText("========================================", true, 0);
+    centerText((choice == 1 ? ">  1 - Pass a day" : "   1 - Pass a day"), true, 0);
+    centerText((choice == 2 ? ">  2 - Check a tile" : "   2 - Check a tile"), true, 0);
+    centerText((choice == 3 ? ">  3 - Quit" : "   3 - Quit"), true, 0);
+
+
+    if (konamiCodeActivated) {
+        cout << endl;
+        centerText("       Cheat Command : ", true, 0);
+        centerText((choice == 4 ? ">  4 - Flood map" : "   4 - Flood map"), true, 0);
+        centerText((choice == 5 ? ">  5 - Wake volcano (not working)" : "   5 - Wake volcano (not working)"), true, 0);
+        centerText((choice == 6 ? ">  6 - Earthquake (not working)" : "   6 - Earthquake (not working)"), true, 0);
+        centerText((choice == 7 ? ">  7 - Nuke (not working)" : "   7 - Nuke (not working)"), true, 0);
+    }
+    centerText("========================================", true, 0);
+}
+
+
+void displayMenu() {
+    int choice = 1;
+    bool konamiCodeActivated = false;
     vector<Key> inputs;
 
     while (true) {
-        Key key = Key::OTHER;
-        int input = _getch();
+        displayGameMenuOptions(choice, konamiCodeActivated);
+        Key input = getKeyInput();
 
-        if (input == 224) {
-            switch (_getch()) {
-            case 72: key = Key::UP; break;
-            case 80: key = Key::DOWN; break;
-            case 75: key = Key::LEFT; break;
-            case 77: key = Key::RIGHT; break;
+        if (input != INVALID) {
+            inputs.push_back(input);
+
+            if (checkKonamiCode(inputs)) {
+                konamiCodeActivated = true;
+                inputs.clear();
             }
         }
-        else if (input == 'b' || input == 'B') {
-            key = Key::B;
-        }
-        else if (input == 'a' || input == 'A') {
-            key = Key::A;
-        }
 
-        if (key != Key::OTHER) {
-            inputs.push_back(key);
-        }
-
-        if (!konamiCode(inputs)) {
-            cout << "Incorrect sequence. Code cancelled." << endl;
-            break;
-        }
-        else if (inputs.size() == 10) {
-            cout << "Konami Code detected!" << endl;
-            break;
-        }
-    }
-}
-
-void displayMenu() {
-    int choice;
-    string input;
-    cout << endl << endl << endl;
-    cout << "1 - Pass a day" << endl;
-    cout << "2 - Check a tile" << endl;
-    cout << "3 - Quit" << endl;
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-    cout << "Temporary Command : " << endl;
-    cout << "4 - Flood map" << endl;
-    cout << "5 - Wake volcano (not working)" << endl;
-    cout << "6 - Earthquake (not working" << endl;
->>>>>>> d9f656911a4e8a6da193a06471d49ce8dc7dbb28
-    cin >> choice;
-=======
-    cout << "Temporary Command : " << endl;
-    cout << "4 - Flood map" << endl;
-    cout << "5 - Wake volcano (not working)" << endl;
-    cout << "6 - Earthquake (not working)" << endl;
-
-    while (true) {
-        cin >> input;
-        if (input == "cheat") {
-            cheat();
-        }
-        else {
-            if (isValidInteger(input)) {
-                choice = stoi(input);
-                break;
+        if (input == UP || input == Z){
+            if (choice > 1) {
+                choice--;
             }
         }
-    }
->>>>>>> Stashed changes
-
-    switch (choice) {
-    case 1:
-        map.nextDay();
-        break;
-    case 2:
-        map.checkTile();
-        break;
-    case 3:
-        gameOver = true;
-        break;
-    case 4:
-        map.StartFlooding();
-        map.nextDay();
-        break;
-
-
-    default:
-        break;
+        else if (input == DOWN || input == S) {
+            if (choice < (konamiCodeActivated ? 7 : 3)) {
+                choice++;
+            }
+        }
+        else if (input == SPACE || input == ENTER) {
+            if (choice == 1) {
+                map.nextDay();
+            }
+            else if (choice == 2) {
+                map.checkTile();
+            }
+            else if (choice == 3) {
+                gameOver = true;
+                return;
+            }
+            else if (choice == 4) {
+                map.StartFlooding();
+                map.nextDay();
+            }
+            else if (choice == 5) {
+                // Wake Volcano
+            }
+            else if (choice == 6) {
+                // Earthquake
+            }
+            else if (choice == 7) {
+                // Nuke
+            }
+        }
     }
 }
 
@@ -442,9 +427,6 @@ void startGame() {
     map.startGeneration();
 
     while (!gameOver) {
-        clearScreen();
-        displayLittleTitle();
-        map.displayMap();
         displayMenu();
     }
 }
