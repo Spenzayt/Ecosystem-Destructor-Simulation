@@ -105,7 +105,7 @@ public:
 
     void AddAnimal()
     {
-        AnimalList.push_back(Animals());
+        AnimalList.push_back(Animals(map));
     }
 
 
