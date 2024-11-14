@@ -507,9 +507,9 @@ struct Coordinates
 class Animals {
 private:
     Coordinates coords;
-    float orientation = 0;
+    float orientation = rand() % 6;
     float age = 0;
-    int maxFood; // random
+    int maxFood;
     int currentFood;
     string specie; //TODO : definir ca pour chaque esp�ce
     int dailyEat;
@@ -518,7 +518,20 @@ private:
 
 public:
 
-    Animals(Map& map)
+    Animals(
+        Map& map,
+        Biome type,              // Définir le biome par défaut si nécessaire
+        string specie,                // Nom de l'espèce
+        int maxFood,                         // Quantité maximale de nourriture (peut être randomisé ailleurs)
+        int dailyEat,                         // Quantité de nourriture consommée par jour
+        float speed = 1.0f                       // Vitesse de l'animal
+    ) :
+        maxFood(maxFood),
+        currentFood(maxFood),                     // Initialise currentFood au maximum de nourriture disponible
+        specie(specie),
+        dailyEat(dailyEat),
+        speed(speed),
+        type(type) {
     {;
         vector<pair<int, int>> goodTiles = map.getTiles(type);
         pair<int, int> tile = goodTiles[int(rand() % goodTiles.size())];
