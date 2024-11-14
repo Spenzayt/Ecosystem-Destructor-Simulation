@@ -1,7 +1,6 @@
 #include "map_loader.h"
 #include "display_functions.h"
 #include "map_loader.h"
-
 #include <iostream>
 #include <conio.h>
 #include <cctype>

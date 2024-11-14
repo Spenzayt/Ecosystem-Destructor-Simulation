@@ -1,73 +1,31 @@
 #ifndef MAP_LOADER_H
 #define MAP_LOADER_H
 
+#include "Animals.h"
+#include "display_functions.h"
 #include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <windows.h>
+#include <conio.h>
 #include <vector>
+#include <string>
+#include <thread>
+#include <chrono>
 
-using namespace std;
-
-const int MapSize = 30;
-const int MinResource = 20;
-const int MaxResource = 40;
-
-enum Biome {
-    WATER,
-    GRASS,
-    RICH_GRASS,
-    ROCK,
-    LAVA,
-    FLOODING_WATER,
-    VOLCANO_LAVA,
-    CRATER,
-    DAMAGED,
-    BURNED,
+enum Key {
+    INVALID = -1, UP, DOWN, LEFT, RIGHT, SPACE = 32, ENTER = 13, Z = 'z', S = 's', A = 'a', B = 'b'
 };
 
-struct Tile {
-    Biome biome;
-    int resource;
-    bool AnimalIn;
-};
 
-class Map {
-public:
-    int days = 1;
-    Tile map[MapSize][MapSize];
-
-    bool lakeGeneration;
-    Tile(*getMap())[MapSize];
-
-    bool isFlooding;
-    int nbFlood;
-    int FloodIndex;
-    bool isUnFlooding;
-
-    int volcanoX, volcanoY;
-    int lavaRadius;
-    int lavaDays;
-    bool isErupting;
-
-    void defaultMap();
-    void displayMap();
-    void setColorForBiome(Biome biome);
-
-    void StartFlooding();
-    void ContinueFlooding();
-    void StartUnFlooding();
-    void ContinueUnFlooding();
-    void StartVolcano();
-    void PropagateLava();
-    void LavaToRock();
-    void startGeneration();
-    void checkTile();
-    void nextDay();
-    vector<pair<int, int>> getTiles(Biome biom);
-};
-
-extern Map map;
-extern bool gameOver;
-
-void displayMenu();
 void startGame();
+void displayMenu();
+Key getKeyInput();
+bool checkKonamiCode(const std::vector<Key>& inputs);
 
-#endif
+
+void displayGameMenuOptions(int choice, bool konamiCodeActivated);
+
+bool gameOver;
+
+#endif // MAP_LOADER_H

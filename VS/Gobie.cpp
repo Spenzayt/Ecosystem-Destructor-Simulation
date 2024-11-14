@@ -99,6 +99,7 @@ public:
 		return { totalX, totalY };
 	}
 
+
 	void MoveGroupEffect(SpecieManager GobieManager)
 	{
 		float distTriggerMax = 1;
@@ -114,8 +115,6 @@ public:
 			//TODO : Delete gobie from InRangeGobieList
 			}
 		}
-
-
 
 		// Group Attraction
 		Coordinates coords = getCoords();
