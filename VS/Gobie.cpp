@@ -81,7 +81,7 @@ public:
 		float dirX = cos(angle) * multiplier;
 		float dirY = sin(angle) * multiplier;
 
-		return {dirX, dirY}
+		return { dirX, dirY };
 		// direction == Lui vers moi
 		
 	}
@@ -99,7 +99,7 @@ public:
 		return { totalX, totalY };
 	}
 
-	void Move(SpecieManager GobieManager)
+	void MoveGroupEffect(SpecieManager GobieManager)
 	{
 		float distTriggerMax = 1;
 		Coordinates GobieCoords = getCoords();
