@@ -2,6 +2,8 @@
 #define MAP_LOADER_H
 
 #include <iostream>
+#include <vector>
+
 using namespace std;
 
 const int MapSize = 30;
@@ -16,6 +18,9 @@ enum Biome {
     LAVA,
     FLOODING_WATER,
     VOLCANO_LAVA,
+    CRATER,
+    DAMAGED,
+    BURNED,
 };
 
 struct Tile {
@@ -26,6 +31,7 @@ struct Tile {
 
 class Map {
 public:
+    int days = 1;
     Tile map[MapSize][MapSize];
 
     bool lakeGeneration;
@@ -64,4 +70,4 @@ extern bool gameOver;
 void displayMenu();
 void startGame();
 
-#endif // MAP_LOADER_H
+#endif

@@ -5,6 +5,7 @@
 #include <time.h>
 using namespace std;
 
+
 class Bars :public Animals
 {
 public:
@@ -24,7 +25,7 @@ public:
 	}
 
 };
-class Requin : public Animals
+/*class Requin : public Animals
 {
 public:
 	float age = 0;
@@ -50,4 +51,4 @@ public:
 	}
 
 
-};
+};*/
