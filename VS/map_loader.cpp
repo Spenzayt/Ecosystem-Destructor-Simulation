@@ -9,7 +9,6 @@
 #include <thread>
 #include <chrono>
 
-
 using namespace std;
 
 
@@ -54,6 +53,23 @@ public:
     int lavaDays = 0;
     bool isErupting = false;
 
+    Tile(*getMap())[MapSize] {
+        return map;
+    }
+
+    vector<pair<int, int>> getTiles(Biome biom) {
+        vector<pair<int, int>> Tiles;
+        for (int i = 0; i < MapSize; i++)
+        {
+            for (int j = 0; j < MapSize; j++)
+            {
+                if (map[i][j].biome == biom)
+                {
+                    Tiles.push_back({ i, j });
+                }
+            }
+        }
+    }
 
     void defaultMap() {
         for (int i = 0; i < MapSize; ++i) {
@@ -533,8 +549,7 @@ void displayMenu() {
             }
         }
     }
-}
-
+    }
 
 void startGame() {
     clearScreen();

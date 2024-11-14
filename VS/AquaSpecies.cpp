@@ -4,12 +4,7 @@
 #include <chrono>
 #include <time.h>
 using namespace std;
-class Gobie : public Animals
-{
-public:
 
-
-};
 class Bars :public Animals
 {
 public:

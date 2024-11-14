@@ -29,6 +29,7 @@ public:
     Tile map[MapSize][MapSize];
 
     bool lakeGeneration;
+    Tile(*getMap())[MapSize];
 
     bool isFlooding;
     int nbFlood;
@@ -54,6 +55,7 @@ public:
     void startGeneration();
     void checkTile();
     void nextDay();
+    vector<pair<int, int>> getTiles(Biome biom);
 };
 
 extern Map map;
