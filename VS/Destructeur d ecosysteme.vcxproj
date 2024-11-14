@@ -132,7 +132,6 @@
     <ClCompile Include="display_functions.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="main_menu.cpp" />
-    <ClCompile Include="map.cpp" />
     <ClCompile Include="map_loader.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -143,10 +142,7 @@
     <ClCompile Include="Gobie.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Display.h" />
-    <ClInclude Include="Map.h" />
     <ClInclude Include="Input.h" />
-    <ClInclude Include="MainMenu.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

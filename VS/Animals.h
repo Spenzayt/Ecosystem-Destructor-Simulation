@@ -1,17 +1,24 @@
-#ifndef ANIMALS_H
-#define ANIMALS_H
-
 #include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <windows.h>
+#include <conio.h>
 #include <vector>
 #include <string>
+#include <thread>
+#include <chrono>
 #include "display_functions.h"
 
-// Taille de la carte et ressources
+using namespace std;
+
+// ---------------------------------------------------------------------------------
+// Configuration de la carte et types de données
+// ---------------------------------------------------------------------------------
+
 const int MapSize = 30;
 const int MinResource = 20;
 const int MaxResource = 40;
 
-// Définition des types de biomes
 enum Biome {
     WATER,
     GRASS,
@@ -25,34 +32,39 @@ enum Biome {
     BURNED,
 };
 
-// Structure de tuiles de la carte
 struct Tile {
     Biome biome;
     int resource;
     bool AnimalIn;
 };
 
-// Classe de gestion de la carte
+// ---------------------------------------------------------------------------------
+// Classe Map : gestion de la carte et génération des biomes
+// ---------------------------------------------------------------------------------
+
 class Map {
 public:
-    int days;
+    int days = 1;
     Tile map[MapSize][MapSize];
-    bool lakeGeneration;
+    bool lakeGeneration = false;
 
-    // Variables spécifiques aux espèces et aux phénomènes naturels
+    Tile(*getMap())[MapSize] {
+        return map;
+        }
 
-    bool isFlooding;
+        // Variables pour les inondations
+    bool isFlooding = false;
     int nbFlood;
-    int FloodIndex;
-    bool isUnFlooding;
-    int volcanoX, volcanoY;
-    int lavaRadius;
-    int lavaDays;
-    bool isErupting;
+    int FloodIndex = 0;
+    bool isUnFlooding = false;
 
-    Map();
-    Tile(*getMap())[MapSize];
-    std::vector<std::pair<int, int>> getTiles(Biome biom);
+    // Variables pour les volcans
+    int volcanoX, volcanoY;
+    int lavaRadius = 1;
+    int lavaDays = 0;
+    bool isErupting = false;
+
+    // Méthodes de génération et affichage
     void defaultMap();
     void displayMap();
     void setColorForBiome(Biome biome);
@@ -62,6 +74,8 @@ public:
     void generateLargeWaterBodies();
     void generateResources();
     void generateVolcano();
+
+    // Méthodes pour les événements naturels
     void StartFlooding();
     void StartUnFlooding();
     void ContinueFlooding();
@@ -69,28 +83,35 @@ public:
     void StartVolcano();
     void PropagateLava();
     void LavaToRock();
+
+    // Autres méthodes de gestion de la carte
     void SpawnTest();
     void startGeneration();
     void checkTile();
     void nextDay();
     void nuke(int x, int y, int radius);
+
+    // Autres méthodes
+    vector<pair<int, int>> getTiles(Biome biom);
 };
 
-// Structure de coordonnées
+// ---------------------------------------------------------------------------------
+// Gestion des animaux : struct Coordinates et classe Animals
+// ---------------------------------------------------------------------------------
+
 struct Coordinates {
     float x;
     float y;
 };
 
-// Classe Animaux
 class Animals {
 private:
     Coordinates coords;
-    float orientation;
-    float age;
+    float orientation = 0;
+    float age = 0;
     int maxFood;
     int currentFood;
-    std::string specie;
+    string specie;
     int dailyEat;
     float speed;
     Biome type;
@@ -104,18 +125,20 @@ public:
     void Eat(Map& map);
 };
 
-// Classe de gestion des espèces
+// ---------------------------------------------------------------------------------
+// Gestion des espèces : classe SpecieManager
+// ---------------------------------------------------------------------------------
+
 class SpecieManager {
 public:
     std::vector<Animals> AnimalList;
-    std::string name;
+    string name;
 
-    SpecieManager(std::string n);
+    SpecieManager(string n) : name(n) {}
+
     void AddAnimal(Map& map);
     int GetNumberAnimal();
     std::vector<Animals> GetAnimalsArround(float x, float y, float radius = 1);
     void ShowCoords();
     void MoveAnimals(Map& map);
 };
-
-#endif // ANIMALS_H

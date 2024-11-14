@@ -1,5 +1,5 @@
-#ifndef MAP_LOADER_H
-#define MAP_LOADER_H
+#ifndef GAME_H
+#define GAME_H
 
 #include "Animals.h"
 #include "display_functions.h"
@@ -13,19 +13,27 @@
 #include <thread>
 #include <chrono>
 
+extern bool gameOver;
+extern Map map;
+
+// Énumération pour les touches de commande dans le jeu
 enum Key {
     INVALID = -1, UP, DOWN, LEFT, RIGHT, SPACE = 32, ENTER = 13, Z = 'z', S = 's', A = 'a', B = 'b'
 };
 
-
-void startGame();
-void displayMenu();
+// Obtient l'entrée de l'utilisateur pour les commandes du jeu
 Key getKeyInput();
+
+// Vérifie si la séquence de touches saisie correspond au code Konami
 bool checkKonamiCode(const std::vector<Key>& inputs);
 
+// Affiche les options du menu de jeu, avec une option de triche si le code Konami est activé
+void displayGameMenuOptions(const int choice, bool konamiCodeActivated);
 
-void displayGameMenuOptions(int choice, bool konamiCodeActivated);
+// Gère le menu principal du jeu et ses interactions
+void displayMenu();
 
-bool gameOver;
+// Lance et gère la boucle principale du jeu
+void startGame();
 
-#endif // MAP_LOADER_H
+#endif // GAME_H
