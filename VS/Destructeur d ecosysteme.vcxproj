@@ -139,7 +139,6 @@
     <ClInclude Include="main_menu.h" />
     <ClInclude Include="map_loader.h" />
     <ClCompile Include="Gobie.cpp" />
-    <ClCompile Include="Map.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Display.h" />

@@ -13,25 +13,39 @@ struct Coordinates
 class Animals {
 private:
     Coordinates coords;
-    float orientation = 0;
+    float orientation = rand() % 6;
     float age = 0;
-    int maxFood; // random
+    int maxFood;
     int currentFood;
-    string specie; //TODO : d�finir �a pour chaque esp�ce
+    string specie; //TODO : definir ca pour chaque esp�ce
     int dailyEat;
     float speed;
     Biome type;
 
-public:
 
-    Animals(Map& map)
-    {;
+public:
+    Animals(
+        Map& map,
+        Biome type,              // Définir le biome par défaut si nécessaire
+        string specie,                // Nom de l'espèce
+        int maxFood,                         // Quantité maximale de nourriture (peut être randomisé ailleurs)
+        int dailyEat,                         // Quantité de nourriture consommée par jour
+        float speed = 1.0f                       // Vitesse de l'animal
+    ) :
+        maxFood(maxFood),
+        currentFood(maxFood),                     // Initialise currentFood au maximum de nourriture disponible
+        specie(specie),
+        dailyEat(dailyEat),
+        speed(speed),
+        type(type) 
+    
+    {
         vector<pair<int, int>> goodTiles = map.getTiles(type);
         pair<int, int> tile = goodTiles[int(rand() % goodTiles.size())];
         coords.x = tile.first;
         coords.y = tile.second;
-
     }
+
 
     Coordinates getCoords()
     {
@@ -41,6 +55,11 @@ public:
     {
         coords.x = x;
         coords.y = y;
+    }
+
+    float GetDirection()
+    {
+        return orientation;
     }
 
     void Move(Map& map)
@@ -85,26 +104,47 @@ public:
     void Eat(Map& map)
     {
         Tile(*gameMap)[MapSize] = map.getMap();
-        
+
         currentFood += dailyEat;
         gameMap[int(coords.x)][int(coords.y)].resource - dailyEat;
 
     }
 };
 
+
+
 class SpecieManager
 {
 public:
     std::vector<Animals> AnimalList;
-    string name;
+    Map& map;
+    Biome type;    // Définir le biome par défaut si nécessaire
+    string specie; // Nom de l'espèce
+    int maxFood;   // Quantité maximale de nourriture (peut être randomisé ailleurs)
+    int dailyEat;   // Quantité de nourriture consommée par jour
+    float speed;
 
-    SpecieManager(string n) : name(n)
+    SpecieManager(
+        Map& map,
+        Biome type,              // Définir le biome par défaut si nécessaire
+        string specie,                // Nom de l'espèce
+        int maxFood,                         // Quantité maximale de nourriture (peut être randomisé ailleurs)
+        int dailyEat,                         // Quantité de nourriture consommée par jour
+        float speed = 1.0f                       // Vitesse de l'animal
+    ) :
+        maxFood(maxFood),
+        specie(specie),
+        dailyEat(dailyEat),
+        speed(speed),
+        type(type),
+        map(map)
     {
+
     }
 
-    void AddAnimal()
+    void AddAnimal(Map& map)
     {
-        AnimalList.push_back(Animals(map));
+        AnimalList.push_back(Animals(map, type, specie, maxFood, dailyEat, speed));
     }
 
 
@@ -135,22 +175,11 @@ public:
         return closeList;
     }
 
-    void ShowCoords()
-    {
-        int counter = 0;
-        for (auto animal : AnimalList)
-        {
-            counter += 1;
-            Coordinates coords = animal.getCoords();
-            cout << name << counter << ": " << coords.x << ", " << coords.y << endl;
-        }
-    }
-
-    void MoveAnimals()
+    void MoveAnimals(Map& map)
     {
         for (auto animal : AnimalList)
         {
-            //animal.move();
+            animal.Move(map);
         }
     }
 };
