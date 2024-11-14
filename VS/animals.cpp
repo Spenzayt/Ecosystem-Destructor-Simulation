@@ -17,7 +17,7 @@ private:
     float age = 0;
     int maxFood; // random
     int currentFood;
-    string specie; //TODO : définir ça pour chaque espèce
+    string specie; //TODO : dï¿½finir ï¿½a pour chaque espï¿½ce
     int dailyEat;
     float speed;
     Biome type;
@@ -37,8 +37,7 @@ public:
     {
         return coords;
     }
-    
-    void SetCoord(float x, float y)
+    void SetCoords(float x, float y)
     {
         coords.x = x;
         coords.y = y;
@@ -69,7 +68,7 @@ public:
 
                 else
                 {
-                    orientation += 1; // environ 60 degrés de plus
+                    orientation += 1; // environ 60 degrï¿½s de plus
                 }
             }
         }
@@ -119,6 +118,23 @@ public:
         return counter;
     }
 
+    std::vector<Animals> GetAnimalsArround(float x, float y, float radius = 1)
+    {
+        //return the number of animal of that specie arround a place, with a radius (by default radius = 1).
+        // Dans une zone carrï¿½e
+        std::vector<Animals> closeList;
+        for (auto animal : AnimalList)
+        {
+            Coordinates animalCoords = animal.getCoords();
+            if ((animalCoords.x > x - radius && animalCoords.x < x + radius) &&
+                (animalCoords.y > y - radius && animalCoords.y < y + radius))
+            {
+                closeList.push_back(animal);
+            }
+        }
+        return closeList;
+    }
+
     void ShowCoords()
     {
         int counter = 0;
@@ -129,36 +145,12 @@ public:
             cout << name << counter << ": " << coords.x << ", " << coords.y << endl;
         }
     }
-    
-    int GetNumberAnimalsArround(float x, float y, float radius = 1)
-    {
-        //return the number of animal of that specie arround a place, with a radius (by default radius = 1).
-        // Dans une zone carrée
-
-        int counter = 0;
-        if (AnimalList.size() == 0)
-            return 0;
-        for (auto animal : AnimalList)
-        {
-            Coordinates animalCoords = animal.getCoords();
-            if ((animalCoords.x > x - radius && animalCoords.x < x + radius) &&
-                (animalCoords.y > y - radius && animalCoords.y < y + radius))
-            {
-                counter += 1;
-            }
-        }
-        return counter;
-    }
-
-    
 
     void MoveAnimals()
     {
         for (auto animal : AnimalList)
         {
             //animal.move();
-            return;
         }
     }
-
 };

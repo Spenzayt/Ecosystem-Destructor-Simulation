@@ -138,6 +138,14 @@
     <ClInclude Include="display_functions.h" />
     <ClInclude Include="main_menu.h" />
     <ClInclude Include="map_loader.h" />
+    <ClCompile Include="Gobie.cpp" />
+    <ClCompile Include="Map.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Display.h" />
+    <ClInclude Include="Map.h" />
+    <ClInclude Include="Input.h" />
+    <ClInclude Include="MainMenu.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

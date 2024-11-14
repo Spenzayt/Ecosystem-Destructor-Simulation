@@ -40,14 +40,14 @@ public:
 		srand(time(NULL));
 		int food = rand() % 100;
 
-		cout << "la nouriture est initialisée à " << food;
+		cout << "la nouriture est initialisï¿½e ï¿½ " << food;
 		return;
 	}
 	~Requin() {
-		cout << elementNb << " est détruit." << std::endl;
+		cout << elementNb << " est dï¿½truit." << std::endl;
 	}
 	void getInfo() {
-		cout << "L'élément numéro " << elementNb << "a pour age : " << age << ", sa barre de nourriture est à " << food << " et sa vie est à " << life << endl;
+		cout << "L'ï¿½lï¿½ment numï¿½ro " << elementNb << "a pour age : " << age << ", sa barre de nourriture est ï¿½ " << food << " et sa vie est ï¿½ " << life << endl;
 	}
 
 
