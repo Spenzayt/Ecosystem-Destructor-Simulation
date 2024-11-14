@@ -524,8 +524,8 @@ void displayGameMenuOptions(const int choice, bool konamiCodeActivated) {
         cout << endl;
         centerText("       Cheat Command : ", true, 0);
         centerText((choice == 4 ? ">  4 - Flood map" : "   4 - Flood map"), true, 0);
-        centerText((choice == 5 ? ">  5 - Wake volcano (not working)" : "   5 - Wake volcano (not working)"), true, 0);
-        centerText((choice == 6 ? ">  6 - Nuke (not working)" : "   6 - Nuke (not working)"), true, 0);
+        centerText((choice == 5 ? ">  5 - Wake volcano" : "   5 - Wake volcano"), true, 0);
+        centerText((choice == 6 ? ">  6 - Nuke" : "   6 - Nuke"), true, 0);
     }
     centerText("========================================", true, 0);
 }
