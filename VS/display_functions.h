@@ -10,5 +10,6 @@ void displayTitle();
 void clearScreen();
 void displayLittleTitle();
 void setColorText(int textColor);
+void setColorBg(int bgColor);
 
 #endif
