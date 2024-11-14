@@ -44,6 +44,10 @@ public:
     Tile map[MapSize][MapSize];
     bool lakeGeneration = false;
 
+    Tile(*getMap())[MapSize] {
+        return map;
+    }
+
     // Flooding related variables.
     bool isFlooding = false;
     int nbFlood;
@@ -196,7 +200,7 @@ public:
     }
 
     void generateResources() {
-        int numResources = rand() % 100 + 100;
+        int numResources = rand() % 100 + 50;
         for (int i = 0; i < numResources; ++i) {
             int x = rand() % MapSize;
             int y = rand() % MapSize;
@@ -229,7 +233,7 @@ public:
         }
     }
 
-    void StartFlooding() // Fonctionne pas pour le moment
+    void StartFlooding()
     {
         nbFlood = (rand() % 3) + 2;
         FloodIndex = 0;
@@ -258,6 +262,7 @@ public:
         }
         else {
             isFlooding = false;
+            FloodIndex = 0;
             StartUnFlooding();
         }
         FloodIndex++;
@@ -289,7 +294,7 @@ public:
         }
     }
 
-    void StartEruption() {
+    void StartVolcano() {
         isErupting = true;
         lavaRadius = 1;
         lavaDays = 0;
@@ -306,13 +311,14 @@ public:
                     if (map[newX][newY].biome != ROCK && map[newX][newY].biome != LAVA && map[newX][newY].biome != VOLCANO_LAVA) {
                         map[newX][newY].biome = LAVA;
                         map[newX][newY].resource = 0;
+                        map[newX][newY].AnimalIn = false;
                     }
                 }
             }
         }
         lavaRadius++;
-        if (lavaRadius > 15) {
-            lavaRadius = 15;
+        if (lavaRadius > 20) {
+            lavaRadius = 20;
         }
     }
 
@@ -376,6 +382,15 @@ public:
         case RICH_GRASS:
             cout << "Biome: Rich Grass" << endl;
             break;
+        case LAVA:
+            cout << "Biome: Lava" << endl;
+            break;
+        case ROCK:
+            cout << "Biome: Rock" << endl;
+            break;
+        case VOLCANO_LAVA:
+            cout << "Biome: Lava" << endl;
+            break;
         }
         cout << "Remaining resources: " << map[x][y].resource << endl;
         displayMap();
@@ -411,6 +426,15 @@ public:
         }
 
         for (int day = 0; day < daysToPass; day++) {
+            int x = (rand() % 99) + 1;
+            if (x <= 80){
+            }
+            if (x > 80 && x < 90) {
+            StartFlooding();
+            }
+            if (x > 90) {
+            StartVolcano();
+            }
             if (isFlooding) {
                 ContinueFlooding();
             }

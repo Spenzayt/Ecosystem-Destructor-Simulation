@@ -55,7 +55,7 @@ public:
     void ContinueFlooding();
     void StartUnFlooding();
     void ContinueUnFlooding();
-    void StartEruption();
+    void StartVolcano();
     void PropagateLava();
     void LavaToRock();
     void startGeneration();
