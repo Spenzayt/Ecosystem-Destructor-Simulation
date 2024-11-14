@@ -40,6 +40,11 @@ struct Tile {
 
 class Map {
 public:
+
+    int animalX = 15;
+    int animalY = 15;
+
+
     int days = 1;
     Tile map[MapSize][MapSize];
     bool lakeGeneration = false;
@@ -354,6 +359,33 @@ public:
         displayMap();
     }
 
+    int RandomRange(int min, int max) {
+        return rand() % (max - min + 1) + min;
+    }
+
+
+    void MoveAnimal() {
+        const int MAX_ATTEMPTS = 20;
+
+        for (int attempt = 0; attempt < MAX_ATTEMPTS; ++attempt) {
+            int offsetX = RandomRange(-3, 3);
+            int offsetY = RandomRange(-3, 3);
+
+            int newX = animalX + offsetX;
+            int newY = animalY + offsetY;
+            if (newX >= 0 && newX < MapSize && newY >= 0 && newY < MapSize) {
+                if (map[newX][newY].biome != WATER && !map[newX][newY].AnimalIn) {
+                    map[animalX][animalY].AnimalIn = false;
+                    map[newX][newY].AnimalIn = true;
+
+                    animalX = newX;
+                    animalY = newY;
+                    return;
+                }
+            }
+        }
+    }
+
     void checkTile() {
         int x, y;
         cout << "Enter coordinates to check a Tile (x y): " << endl;
@@ -453,6 +485,7 @@ public:
                 }
             }
             days++;
+            MoveAnimal();
             clearScreen();
             displayLittleTitle();
             displayMap();
@@ -600,7 +633,7 @@ void displayMenu() {
                 map.nextDay();
             }
             else if (choice == 5) {
-                map.generateVolcano();
+                map.StartVolcano();
                 map.nextDay();
             }
             else if (choice == 6) {
