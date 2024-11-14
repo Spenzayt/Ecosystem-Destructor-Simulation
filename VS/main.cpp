@@ -1,4 +1,5 @@
 #include "main_menu.h"
+#include "display_functions.h"
 
 
 int main() {

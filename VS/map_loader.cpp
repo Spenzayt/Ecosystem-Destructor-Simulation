@@ -1,8 +1,14 @@
-﻿#include "display_functions.h"
+#include "display_functions.h"
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
 #include <windows.h>
+#include <conio.h>
+#include <vector>
+#include <string>
+#include <thread>
+#include <chrono>
+
 
 using namespace std;
 
@@ -32,6 +38,7 @@ struct Tile {
 
 class Map {
 public:
+    int days = 1;
     Tile map[MapSize][MapSize];
     bool lakeGeneration = false;
 
@@ -59,9 +66,11 @@ public:
     }
 
     void displayMap() {
+        cout << endl;
         for (int i = 0; i < MapSize; ++i) {
-            cout << endl;
-            for (int j = 0; j < MapSize; ++j) {
+            setColorForBiome(map[i][0].biome);
+            centerText("\xDB\xDB", false, MapSize * 2);
+            for (int j = 1; j < MapSize; ++j) {
                 setColorForBiome(map[i][j].biome);
                 if (map[i][j].AnimalIn) {
                     setColorText(0);
@@ -71,6 +80,7 @@ public:
                     cout << "  ";
                 }
             }
+            cout << endl;
             setColorBg(0);
         }
         setColorText(7);
@@ -344,25 +354,57 @@ public:
     }
 
     void nextDay() {
+        int daysToPass = 1;
 
-        if (isFlooding) {
-            ContinueFlooding();
-        }
-        if (isUnFlooding) {
-            ContinueUnFlooding();
-        }
-        if (isErupting) {
-            PropagateLava();
-            LavaToRock();
-        }
-        for (int i = 0; i < MapSize; ++i) {
-            for (int j = 0; j < MapSize; ++j) {
-                map[i][j].resource += 5;
+        while (true) {
+            clearScreen();
+            displayLittleTitle();
+            displayMap();
+            cout << "How many days do you want to pass ?" << endl;
+            cout << "Day to pass -> " << daysToPass;
+
+            char input = _getch();
+
+            if (input == 'z' || input == 'Z') {
+                daysToPass++;
+            }
+            else if (input == 's' || input == 'S') {
+                daysToPass--;
+            }
+            else if (input == 72) {
+                daysToPass++;
+            }
+            else if (input == 80) {
+                daysToPass--;
+            }
+            else if (input == 13) {
+                break;
             }
         }
-        clearScreen();
-        displayMap();
-        cout << endl << FloodIndex << endl;
+
+        for (int day = 0; day < daysToPass; day++) {
+            if (isFlooding) {
+                ContinueFlooding();
+            if (isUnFlooding) {
+                ContinueUnFlooding();
+            }
+            if (isErupting) {
+                PropagateLava();
+                LavaToRock();
+            }
+            for (int i = 0; i < MapSize; ++i) {
+                for (int j = 0; j < MapSize; ++j) {
+                    map[i][j].resource += 5;
+                }
+            }
+            days++;
+            clearScreen();
+            displayLittleTitle();
+            displayMap();
+            cout << endl << endl << endl;
+            centerText(to_string(day) + " days pass", true, 0);
+            this_thread::sleep_for(chrono::seconds(2));
+        }
     }
 };
 
@@ -370,38 +412,126 @@ Map map;
 
 bool gameOver = false;
 
-void displayMenu() {
-    int choice;
-    cout << endl;
-    cout << "1 - Pass a day" << endl;
-    cout << "2 - Check a tile" << endl;
-    cout << "3 - Quit" << endl;
-    cout << "Temporary Command : " << endl;
-    cout << "4 - Flood map" << endl;
-    cout << "5 - Wake volcano (not working)" << endl;
-    cout << "6 - Earthquake (not working" << endl;
-    cin >> choice;
+enum Key {
+    INVALID = -1, UP, DOWN, LEFT, RIGHT, SPACE = 32, ENTER = 13, Z = 'z', S = 's', A = 'a', B = 'b'
+};
 
-    switch (choice) {
-    case 1:
-        map.nextDay();
-        break;
-    case 2:
-        map.checkTile();
-        break;
-    case 3:
-        gameOver = true;
-        break;
-    case 4:
-        map.StartFlooding();
-        map.nextDay();
-        break;
-    case 5:
-        map.StartEruption();
-        map.nextDay();
-        break;
-    default:
-        break;
+Key getKeyInput() {
+    int ch = _getch();
+
+    if (ch == 0 || ch == 224) {
+        ch = _getch();
+        switch (ch) {
+        case 72: return UP;
+        case 80: return DOWN;
+        case 77: return RIGHT;
+        case 75: return LEFT;
+        }
+    }
+
+    if (ch == ' ') return SPACE;
+    if (ch == ENTER) return ENTER;
+    if (ch == 'z' || ch == 'Z') return Z;
+    if (ch == 's' || ch == 'S') return S;
+    if (ch == 'b' || ch == 'B') return B;
+    if (ch == 'a' || ch == 'A') return A;
+
+    return INVALID;
+}
+
+bool checkKonamiCode(const vector<Key>& inputs) {
+    const vector<Key> konamiCode = { UP, UP, DOWN, DOWN, LEFT, RIGHT, LEFT, RIGHT, B, A };
+    if (inputs.size() < konamiCode.size()) {
+        return false;
+    }
+
+    for (size_t i = 0; i < konamiCode.size(); ++i) {
+        if (inputs[inputs.size() - konamiCode.size() + i] != konamiCode[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+
+void displayGameMenuOptions(const int choice, bool konamiCodeActivated) {
+    clearScreen();
+    displayLittleTitle();
+    map.displayMap();
+
+    cout << endl << endl;
+    centerText("Day " + to_string(map.days), true, 0);
+    centerText("========================================", true, 0);
+    centerText((choice == 1 ? ">  1 - Pass a day" : "   1 - Pass a day"), true, 0);
+    centerText((choice == 2 ? ">  2 - Check a tile" : "   2 - Check a tile"), true, 0);
+    centerText((choice == 3 ? ">  3 - Quit" : "   3 - Quit"), true, 0);
+
+
+    if (konamiCodeActivated) {
+        cout << endl;
+        centerText("       Cheat Command : ", true, 0);
+        centerText((choice == 4 ? ">  4 - Flood map" : "   4 - Flood map"), true, 0);
+        centerText((choice == 5 ? ">  5 - Wake volcano (not working)" : "   5 - Wake volcano (not working)"), true, 0);
+        centerText((choice == 6 ? ">  6 - Earthquake (not working)" : "   6 - Earthquake (not working)"), true, 0);
+        centerText((choice == 7 ? ">  7 - Nuke (not working)" : "   7 - Nuke (not working)"), true, 0);
+    }
+    centerText("========================================", true, 0);
+}
+
+
+void displayMenu() {
+    int choice = 1;
+    bool konamiCodeActivated = false;
+    vector<Key> inputs;
+
+    while (true) {
+        displayGameMenuOptions(choice, konamiCodeActivated);
+        Key input = getKeyInput();
+
+        if (input != INVALID) {
+            inputs.push_back(input);
+
+            if (checkKonamiCode(inputs)) {
+                konamiCodeActivated = true;
+                inputs.clear();
+            }
+        }
+
+        if (input == UP || input == Z){
+            if (choice > 1) {
+                choice--;
+            }
+        }
+        else if (input == DOWN || input == S) {
+            if (choice < (konamiCodeActivated ? 7 : 3)) {
+                choice++;
+            }
+        }
+        else if (input == SPACE || input == ENTER) {
+            if (choice == 1) {
+                map.nextDay();
+            }
+            else if (choice == 2) {
+                map.checkTile();
+            }
+            else if (choice == 3) {
+                gameOver = true;
+                return;
+            }
+            else if (choice == 4) {
+                map.StartFlooding();
+                map.nextDay();
+            }
+            else if (choice == 5) {
+                // Wake Volcano
+            }
+            else if (choice == 6) {
+                // Earthquake
+            }
+            else if (choice == 7) {
+                // Nuke
+            }
+        }
     }
 }
 
