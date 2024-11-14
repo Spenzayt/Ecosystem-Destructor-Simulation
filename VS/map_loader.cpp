@@ -60,10 +60,6 @@ public:
     int lavaDays = 0;
     bool isErupting = false;
 
-    Tile(*getMap())[MapSize] {
-        return map;
-    }
-
     vector<pair<int, int>> getTiles(Biome biom) {
         vector<pair<int, int>> Tiles;
         for (int i = 0; i < MapSize; i++)
@@ -251,7 +247,7 @@ public:
             for (int i = 0; i < nbFloodedTiles; i++) {
                 int x = (rand() % MapSize);
                 int y = (rand() % MapSize);
-                if (map[x][y].biome != WATER && map[x][y].biome != ROCK && map[x][y].biome != LAVA && map[x][y].biome != FLOODING_WATER) {
+                if (map[x][y].biome != WATER && map[x][y].biome != ROCK && map[x][y].biome != LAVA && map[x][y].biome != FLOODING_WATER && map[x][y].biome != VOLCANO_LAVA) {
                     map[x][y].biome = FLOODING_WATER;
                     map[x][y].resource /= 2;
                 }
@@ -360,14 +356,21 @@ public:
 
     void checkTile() {
         int x, y;
-        cout << "Enter coordinates to check a Tile (x y): ";
-        cin >> x >> y;
+        cout << "Enter coordinates to check a Tile (x y): " << endl;
+        cout << "X -> ";
+        cin >> x;
+        cout << "Y -> ";
+        cin >> y;
+        x--;
+        y--;
         if (x < 0 || x >= MapSize || y < 0 || y >= MapSize) {
             cout << "Invalid coordinates!" << endl;
             return;
         }
 
         clearScreen();
+        displayLittleTitle();
+        displayMap();
         cout << "Tile [" << x << "][" << y << "] Info:" << endl;
         switch (map[x][y].biome) {
         case WATER:
@@ -393,7 +396,6 @@ public:
             break;
         }
         cout << "Remaining resources: " << map[x][y].resource << endl;
-        displayMap();
     }
 
     void nextDay() {
@@ -456,7 +458,7 @@ public:
             displayMap();
             cout << endl << endl << endl;
             centerText(to_string(day) + " days pass", true, 0);
-            this_thread::sleep_for(chrono::seconds(2));
+            this_thread::sleep_for(chrono::seconds(1));
         }
     }
     void nuke(int x, int y, int radius) {
@@ -495,6 +497,9 @@ enum Key {
 
 Key getKeyInput() {
     int ch = _getch();
+    clearScreen();
+    displayLittleTitle();
+    map.displayMap();
 
     if (ch == 0 || ch == 224) {
         ch = _getch();
@@ -532,10 +537,6 @@ bool checkKonamiCode(const vector<Key>& inputs) {
 
 
 void displayGameMenuOptions(const int choice, bool konamiCodeActivated) {
-    clearScreen();
-    displayLittleTitle();
-    map.displayMap();
-
     cout << endl << endl;
     centerText("Day " + to_string(map.days), true, 0);
     centerText("========================================", true, 0);
@@ -599,7 +600,7 @@ void displayMenu() {
                 map.nextDay();
             }
             else if (choice == 5) {
-                map.StartEruption();
+                map.generateVolcano();
                 map.nextDay();
             }
             else if (choice == 6) {
