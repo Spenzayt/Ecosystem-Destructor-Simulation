@@ -26,6 +26,9 @@ enum Biome {
     LAVA,
     FLOODING_WATER,
     VOLCANO_LAVA,
+    CRATER,
+    DAMAGED,
+    BURNED,
 };
 
 
@@ -66,11 +69,11 @@ public:
     }
 
     void displayMap() {
+        setColorBg(0);
         cout << endl;
         for (int i = 0; i < MapSize; ++i) {
-            setColorForBiome(map[i][0].biome);
-            centerText("\xDB\xDB", false, MapSize * 2);
-            for (int j = 1; j < MapSize; ++j) {
+            centerText(" ", false, (MapSize * 2));
+            for (int j = 0; j < MapSize; ++j) {
                 setColorForBiome(map[i][j].biome);
                 if (map[i][j].AnimalIn) {
                     setColorText(0);
@@ -110,7 +113,16 @@ public:
             break;
         case VOLCANO_LAVA:
             bgColor = 4;
-                break;
+            break;
+        case CRATER:
+            bgColor = 4;
+            break;
+        case DAMAGED:
+            bgColor = 12;
+            break;
+        case BURNED:
+            bgColor = 6;
+            break;
         default:
             bgColor = 0;
             break;
@@ -385,6 +397,7 @@ public:
         for (int day = 0; day < daysToPass; day++) {
             if (isFlooding) {
                 ContinueFlooding();
+            }
             if (isUnFlooding) {
                 ContinueUnFlooding();
             }
@@ -406,6 +419,30 @@ public:
             this_thread::sleep_for(chrono::seconds(2));
         }
     }
+    void nuke(int x, int y, int radius) {
+        for (int dx = -radius; dx <= radius; ++dx) {
+            for (int dy = -radius; dy <= radius; ++dy) {
+                int newX = x + dx;
+                int newY = y + dy;
+                if (newX >= 0 && newX < MapSize && newY >= 0 && newY < MapSize) {
+                    int distance = std::sqrt(dx * dx + dy * dy);
+                    if (distance <= radius) {
+                        if (distance <= radius / 3) {
+                            map[newX][newY].biome = CRATER;
+                        }
+                        else if (distance <= 2 * radius / 3) {
+                            map[newX][newY].biome = DAMAGED;
+                        }
+                        else {
+                            map[newX][newY].biome = BURNED;
+                        }
+                        map[newX][newY].resource = 0;
+                    }
+                }
+            }
+        }
+    }
+
 };
 
 Map map;
@@ -472,8 +509,7 @@ void displayGameMenuOptions(const int choice, bool konamiCodeActivated) {
         centerText("       Cheat Command : ", true, 0);
         centerText((choice == 4 ? ">  4 - Flood map" : "   4 - Flood map"), true, 0);
         centerText((choice == 5 ? ">  5 - Wake volcano (not working)" : "   5 - Wake volcano (not working)"), true, 0);
-        centerText((choice == 6 ? ">  6 - Earthquake (not working)" : "   6 - Earthquake (not working)"), true, 0);
-        centerText((choice == 7 ? ">  7 - Nuke (not working)" : "   7 - Nuke (not working)"), true, 0);
+        centerText((choice == 6 ? ">  6 - Nuke (not working)" : "   6 - Nuke (not working)"), true, 0);
     }
     centerText("========================================", true, 0);
 }
@@ -523,13 +559,11 @@ void displayMenu() {
                 map.nextDay();
             }
             else if (choice == 5) {
-                // Wake Volcano
+                map.StartEruption();
+                map.nextDay();
             }
             else if (choice == 6) {
-                // Earthquake
-            }
-            else if (choice == 7) {
-                // Nuke
+                map.nuke(15,15,16);
             }
         }
     }
