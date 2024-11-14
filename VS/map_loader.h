@@ -1,7 +1,8 @@
-#ifndef MAP_H
-#define MAP_H
+#ifndef MAP_LOADER_H
+#define MAP_LOADER_H
 
 #include <iostream>
+using namespace std;
 
 const int MapSize = 30;
 const int MinResource = 20;
@@ -14,11 +15,13 @@ enum Biome {
     ROCK,
     LAVA,
     FLOODING_WATER,
+    VOLCANO_LAVA,
 };
 
 struct Tile {
     Biome biome;
-    float resource;
+    int resource;
+    bool AnimalIn;
 };
 
 class Map {
@@ -32,18 +35,22 @@ public:
     int FloodIndex;
     bool isUnFlooding;
 
+    int volcanoX, volcanoY;
+    int lavaRadius;
+    int lavaDays;
+    bool isErupting;
+
     void defaultMap();
     void displayMap();
     void setColorForBiome(Biome biome);
-    void generateWater();
-    void generateLakes(int numLakes);
-    void generateLakeRadius(int x, int y, int radius);
-    void generateLargeWaterBodies();
-    void generateResources();
-    void generateVolcano();
+
     void StartFlooding();
-    void StartUnFlooding();
     void ContinueFlooding();
+    void StartUnFlooding();
+    void ContinueUnFlooding();
+    void StartEruption();
+    void PropagateLava();
+    void LavaToRock();
     void startGeneration();
     void checkTile();
     void nextDay();
@@ -55,4 +62,4 @@ extern bool gameOver;
 void displayMenu();
 void startGame();
 
-#endif 
+#endif // MAP_LOADER_H

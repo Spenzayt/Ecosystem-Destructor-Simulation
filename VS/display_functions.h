@@ -8,7 +8,8 @@ using namespace std;
 void centerText(const string text, bool endline, int add);
 void displayTitle();
 void clearScreen();
-void setColor(int textColor);
+void setColorText(int textColor);
+void setColorBg(int bgColor);
 
 
 #endif
