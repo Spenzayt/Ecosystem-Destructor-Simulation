@@ -51,7 +51,7 @@ void displayLittleTitle() {
 
 
 void clearScreen() {
-	system("cls");
+	//system("cls");
 }
 
 void setColorText(int textColor) {
