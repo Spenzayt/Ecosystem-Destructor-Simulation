@@ -130,12 +130,9 @@
     <ClCompile Include="Destructeur d ecosysteme.cpp" />
     <ClCompile Include="Display.cpp" />
     <ClCompile Include="Gobie.cpp" />
-<<<<<<< Updated upstream
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="Map.cpp" />
-=======
     <ClInclude Include="SpecieManager.h" />
->>>>>>> Stashed changes
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Display.h" />
