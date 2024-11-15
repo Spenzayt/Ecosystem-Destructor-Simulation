@@ -738,7 +738,7 @@ void nextDay() {
                 }
             }
         }
-        printf(GobieManager.GetNumberAnimal());
+        //printf(GobieManager.GetNumberAnimal());
         
 
         map.days++;
