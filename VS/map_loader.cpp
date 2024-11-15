@@ -57,10 +57,10 @@ public:
 
     Tile(*getMap())[MapSize] {
         return map;
-        }
+    }
 
 
-        // Flooding related variables.
+    // Flooding related variables.
     bool isFlooding = false;
     int nbFlood;
     int FloodIndex = 0;
@@ -552,7 +552,7 @@ public:
 
                 else
                 {
-                    orientation += 1; // environ 60 degr�s de plus
+                    orientation += 1; 
                 }
             }
         }
@@ -621,11 +621,11 @@ public:
         return counter;
     }
 
-    std::vector<Animals> GetAnimalsArround(float x, float y, float radius = 1)
+    vector<Animals> GetAnimalsArround(float x, float y, float radius = 1)
     {
         //return the number of animal of that specie arround a place, with a radius (by default radius = 1).
         // Dans une zone carr�e
-        std::vector<Animals> closeList;
+        vector<Animals> closeList;
         for (auto animal : AnimalList)
         {
             Coordinates animalCoords = animal.getCoords();
@@ -648,14 +648,9 @@ public:
 
 bool gameOver = false;
 
-
-
 // DEF SPECIES
 SpecieManager GobieManager = SpecieManager(map.map, WATER, "Gobie", 3, 1, 1.0f);
 SpecieManager SharkManager = SpecieManager(map.map, WATER, "Sharl", 10, 5, 2.5f);
-
-
-
 
 
 
@@ -752,11 +747,6 @@ void nextDay() {
 
     }
 }
-
-
-
-
-
 
 enum Key {
     INVALID = -1, UP, DOWN, LEFT, RIGHT, SPACE = 32, ENTER = 13, Z = 'z', S = 's', A = 'a', B = 'b'
