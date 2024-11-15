@@ -126,7 +126,7 @@ public:
                     else if (map[i][j].AnimalIn.type == SHARK) {
                         cout << "S";
                     }
-                    else if (map[i][j].AnimalIn.type == BEAR) {
+                    if (map[i][j].AnimalIn.type == BEAR) {
                         cout << "B";
                     }
                     else if (map[i][j].AnimalIn.type == WOLF) {
@@ -862,8 +862,20 @@ void drawSpecie(vector<SpecieManager> SpecieList)
 
                     }
 
-                    map.map[i][j].AnimalIn = counter;
-
+                    map.map[i][j].AnimalIn.numberIn = counter;
+                    
+                    if (specie.specie == "Gobie") {
+                        map.map[i][j].AnimalIn.type = GOBIE;
+                    }
+                    else if (specie.specie == "Sharl") {
+                        map.map[i][j].AnimalIn.type = SHARK;
+                    }
+                    else if (specie.specie == "Bear") {
+                        map.map[i][j].AnimalIn.type = BEAR;
+                    }
+                    else if (specie.specie == "Wolf") {
+                        map.map[i][j].AnimalIn.type = WOLF;
+                    }
 
                 }
             }
