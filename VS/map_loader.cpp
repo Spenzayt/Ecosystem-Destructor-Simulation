@@ -27,10 +27,23 @@ enum Biome {
     BURNED,
 };
 
+enum AnimalsList {
+    GOBIE,
+    SHARK,
+    BEAR,
+    WOLF,
+};
+
+struct AnimalInTile {
+    int numberIn;
+    AnimalsList type;
+
+};
+
 struct Tile {
     Biome biome;
     int resource;
-    int AnimalIn;
+    AnimalInTile AnimalIn;
 };
 
 const int MapSize = 30;
@@ -92,7 +105,7 @@ public:
             for (int j = 0; j < MapSize; ++j) {
                 map[i][j].biome = GRASS;
                 map[i][j].resource = rand() % (MaxResource - MinResource + 1) + MinResource;
-                map[i][j].AnimalIn = 0;
+                map[i][j].AnimalIn.numberIn + 0;
             }
         }
     }
@@ -104,9 +117,22 @@ public:
             centerText(" ", false, (MapSize * 2));
             for (int j = 0; j < MapSize; ++j) {
                 setColorForBiome(map[i][j].biome);
-                if (map[i][j].AnimalIn > 0) {
+                if (map[i][j].AnimalIn.numberIn > 0) {
                     setColorText(0);
-                    cout << map[i][j].AnimalIn << " ";
+
+                    if (map[i][j].AnimalIn.type == GOBIE) {
+                        cout << "G";
+                    }
+                    else if (map[i][j].AnimalIn.type == SHARK) {
+                        cout << "S";
+                    }
+                    else if (map[i][j].AnimalIn.type == BEAR) {
+                        cout << "B";
+                    }
+                    else if (map[i][j].AnimalIn.type == WOLF) {
+                        cout << "W";
+                    }
+                    cout << map[i][j].AnimalIn.numberIn;
                 }
                 else {
                     cout << "  ";
@@ -320,7 +346,7 @@ public:
                     if (map[newX][newY].biome != ROCK && map[newX][newY].biome != LAVA && map[newX][newY].biome != VOLCANO_LAVA) {
                         map[newX][newY].biome = LAVA;
                         map[newX][newY].resource = 0;
-                        map[newX][newY].AnimalIn = false;
+                        map[newX][newY].AnimalIn.numberIn = 0;
                     }
                 }
             }
@@ -350,47 +376,12 @@ public:
         lavaDays = 0;
     }
 
-    void SpawnTest()
-    {
-        int x = (rand() % MapSize);
-        int y = (rand() % MapSize);
-
-        map[x][y].AnimalIn = true;
-    }
-
     void startGeneration() {
         defaultMap();
         generateWater();
         generateResources();
         generateVolcano();
         displayMap();
-    }
-
-    int RandomRange(int min, int max) {
-        return rand() % (max - min + 1) + min;
-    }
-
-
-    void MoveAnimal() {
-        const int MAX_ATTEMPTS = 20;
-
-        for (int attempt = 0; attempt < MAX_ATTEMPTS; ++attempt) {
-            int offsetX = RandomRange(-3, 3);
-            int offsetY = RandomRange(-3, 3);
-
-            int newX = animalX + offsetX;
-            int newY = animalY + offsetY;
-            if (newX >= 0 && newX < MapSize && newY >= 0 && newY < MapSize) {
-                if (map[newX][newY].biome != WATER && !map[newX][newY].AnimalIn) {
-                    map[animalX][animalY].AnimalIn = false;
-                    map[newX][newY].AnimalIn = true;
-
-                    animalX = newX;
-                    animalY = newY;
-                    return;
-                }
-            }
-        }
     }
 
     void checkTile() {
@@ -464,10 +455,6 @@ public:
 };
 
 
-
-
-
-
 Map map;
 
 struct Coordinates
@@ -498,7 +485,7 @@ public:
         float speed = 1.0f                       // Vitesse de l'animal
     ) :
         maxFood(maxFood),
-        currentFood(maxFood),                     // Initialise currentFood au maximum de nourriture disponible
+        currentFood(maxFood),                     // Initialise currentFood au maximum de nourriture disponiblex 
         specie(specie),
         dailyEat(dailyEat),
         speed(speed),
@@ -701,7 +688,7 @@ void drawSpecie(vector<SpecieManager> SpecieList)
 
                     }
 
-                    map.map[i][j].AnimalIn = counter;
+                    map.map[i][j].AnimalIn.numberIn = counter;
 
 
                 }
