@@ -1,5 +1,5 @@
 #include <iostream>
-#include "animals.cpp"
+#include "map_loader.h"
 #include <cstdlib>
 #include <chrono>
 #include <time.h>

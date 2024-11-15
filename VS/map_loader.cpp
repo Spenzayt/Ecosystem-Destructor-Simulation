@@ -27,10 +27,23 @@ enum Biome {
     BURNED,
 };
 
+enum AnimalsList {
+    GOBIE,
+    SHARK,
+    BEAR,
+    WOLF,
+};
+
+struct AnimalInTile {
+    int numberIn;
+    AnimalsList type;
+
+};
+
 struct Tile {
     Biome biome;
     int resource;
-    bool AnimalIn;
+    AnimalInTile AnimalIn;
 };
 
 const int MapSize = 30;
@@ -92,7 +105,7 @@ public:
             for (int j = 0; j < MapSize; ++j) {
                 map[i][j].biome = GRASS;
                 map[i][j].resource = rand() % (MaxResource - MinResource + 1) + MinResource;
-                map[i][j].AnimalIn = false;
+                map[i][j].AnimalIn.numberIn + 0;
             }
         }
     }
@@ -104,9 +117,22 @@ public:
             centerText(" ", false, (MapSize * 2));
             for (int j = 0; j < MapSize; ++j) {
                 setColorForBiome(map[i][j].biome);
-                if (map[i][j].AnimalIn) {
+                if (map[i][j].AnimalIn.numberIn > 0) {
                     setColorText(0);
-                    cout << "0 ";
+
+                    if (map[i][j].AnimalIn.type == GOBIE) {
+                        cout << "G";
+                    }
+                    else if (map[i][j].AnimalIn.type == SHARK) {
+                        cout << "S";
+                    }
+                    else if (map[i][j].AnimalIn.type == BEAR) {
+                        cout << "B";
+                    }
+                    else if (map[i][j].AnimalIn.type == WOLF) {
+                        cout << "W";
+                    }
+                    cout << map[i][j].AnimalIn.numberIn;
                 }
                 else {
                     cout << "  ";
@@ -320,7 +346,7 @@ public:
                     if (map[newX][newY].biome != ROCK && map[newX][newY].biome != LAVA && map[newX][newY].biome != VOLCANO_LAVA) {
                         map[newX][newY].biome = LAVA;
                         map[newX][newY].resource = 0;
-                        map[newX][newY].AnimalIn = false;
+                        map[newX][newY].AnimalIn.numberIn = 0;
                     }
                 }
             }
@@ -350,47 +376,12 @@ public:
         lavaDays = 0;
     }
 
-    void SpawnTest()
-    {
-        int x = (rand() % MapSize);
-        int y = (rand() % MapSize);
-
-        map[x][y].AnimalIn = true;
-    }
-
     void startGeneration() {
         defaultMap();
         generateWater();
         generateResources();
         generateVolcano();
         displayMap();
-    }
-
-    int RandomRange(int min, int max) {
-        return rand() % (max - min + 1) + min;
-    }
-
-
-    void MoveAnimal() {
-        const int MAX_ATTEMPTS = 20;
-
-        for (int attempt = 0; attempt < MAX_ATTEMPTS; ++attempt) {
-            int offsetX = RandomRange(-3, 3);
-            int offsetY = RandomRange(-3, 3);
-
-            int newX = animalX + offsetX;
-            int newY = animalY + offsetY;
-            if (newX >= 0 && newX < MapSize && newY >= 0 && newY < MapSize) {
-                if (map[newX][newY].biome != WATER && !map[newX][newY].AnimalIn) {
-                    map[animalX][animalY].AnimalIn = false;
-                    map[newX][newY].AnimalIn = true;
-
-                    animalX = newX;
-                    animalY = newY;
-                    return;
-                }
-            }
-        }
     }
 
     void checkTile() {
@@ -464,10 +455,6 @@ public:
 };
 
 
-
-
-
-
 Map map;
 
 struct Coordinates
@@ -498,7 +485,7 @@ public:
         float speed = 1.0f                       // Vitesse de l'animal
     ) :
         maxFood(maxFood),
-        currentFood(maxFood),                     // Initialise currentFood au maximum de nourriture disponible
+        currentFood(maxFood),                     // Initialise currentFood au maximum de nourriture disponiblex 
         specie(specie),
         dailyEat(dailyEat),
         speed(speed),
@@ -512,7 +499,12 @@ public:
         coords.y = tile.second;
     }
 
-
+    int getFood() {
+        return currentFood;
+    }
+    void setFood(int _food) {
+        currentFood = _food;
+    }
     Coordinates getCoords()
     {
         return coords;
@@ -530,11 +522,14 @@ public:
 
     void Move(Tile map[30][30])
     {
+        int temp = getFood() - 1;
+        setFood(temp);
 
-        currentFood += -1;
+        cout << getFood() << "\n";
 
         if (currentFood < 0.3f * maxFood) // Si il a moins de 33% de nourriture
         {
+            cout << "efkzf\n";
             if (map[int(coords.x)][int(coords.y)].resource > dailyEat) // Si y'a a manger
             {
                 Eat(map);
@@ -559,17 +554,28 @@ public:
         else
         {
             float randMovement = (float((rand() % 9) + 1) / 10);
-            coords.x += cos(orientation) * speed * randMovement;
-            coords.y += sin(orientation) * speed * randMovement;
-
+            
+            float tempcoordX = cos(orientation) * speed * randMovement;
+            float tempcoordY = sin(orientation) * speed * randMovement;
+            cout << map[int(coords.x + tempcoordX)][int(coords.y + tempcoordY)].biome << "    " << type;
+            if (map[int(coords.x + tempcoordX)][int(coords.y + tempcoordY)].biome == type)
+            {
+                coords.x += tempcoordX;
+                coords.y += tempcoordY;
+            }
+            else
+            {
+                orientation += 1;
+            }
             orientation -= (float((rand() % 9) + 1) / 10);
         }
     }
 
     void Eat(Tile map[30][30])
     {
+        cout << "miam" << currentFood << map[int(coords.x)][int(coords.y)].resource;
         currentFood += dailyEat;
-        map[int(coords.x)][int(coords.y)].resource - dailyEat;
+        map[int(coords.x)][int(coords.y)].resource += -dailyEat;
 
     }
 };
@@ -640,8 +646,12 @@ public:
 
     void MoveAnimals(Tile map[30][30]) {
 
-        for (auto animal : AnimalList) {
-            animal.Move(map);
+        for (auto& animal : AnimalList)
+        {
+            if (animal.getFood() != 0)
+            {
+                animal.Move(map);
+            }
         }
     }
 };
@@ -649,9 +659,43 @@ public:
 bool gameOver = false;
 
 // DEF SPECIES
-SpecieManager GobieManager = SpecieManager(map.map, WATER, "Gobie", 3, 1, 1.0f);
+SpecieManager GobieManager = SpecieManager(map.map, WATER, "Gobie", 9, 5, 1.5f);
+SpecieManager BearManager = SpecieManager(map.map, GRASS, "Bear", 20, 10, 0.5f);
 SpecieManager SharkManager = SpecieManager(map.map, WATER, "Sharl", 10, 5, 2.5f);
 
+
+void drawSpecie(vector<SpecieManager> SpecieList)
+{
+    vector<Coordinates> AnimalInCoords;
+    for (auto specie : SpecieList)
+    {
+        for (auto animal : specie.AnimalList) // pour chaque animal check ou il est et le rajouter a AnimalIn
+        {
+            AnimalInCoords.push_back(animal.getCoords());
+            cout << animal.getCoords().x << ", " << animal.getCoords().y << "\n";
+        }
+
+        for (int i = 0; i < 30; i++)
+        {
+            for (int j = 0; j < 30; j++)
+            {
+                int counter = 0;
+                for (Coordinates coords : AnimalInCoords)
+                {
+                    if (int(coords.x) == i && int(coords.y) == j)
+                    {
+                        counter += 1;
+
+                    }
+
+                    map.map[i][j].AnimalIn.numberIn = counter;
+
+
+                }
+            }
+        }
+    }
+}
 
 
 void nextDay() {
@@ -705,39 +749,18 @@ void nextDay() {
         }
         for (int i = 0; i < MapSize; ++i) {
             for (int j = 0; j < MapSize; ++j) {
-                map.map[i][j].resource += 5;
+                map.map[i][j].resource += rand() % 1;
             }
         }
 
-        GobieManager.AddAnimal();
-        vector<Coordinates> AnimalInCoords;
-        for (auto animal : GobieManager.AnimalList) // pour chaque animal check ou il est et le rajouter a AnimalIn
-        {
-            AnimalInCoords.push_back(animal.getCoords());
-        }
+        //AFFICHAGE
+        drawSpecie({ GobieManager, BearManager });
 
-        for (int i = 0; i < 30; i++)
-        {
-            for (int j = 0; j < 30; j++)
-            {
-                for (Coordinates coords : AnimalInCoords)
-                {
-                    if (int(coords.x) == i && int(coords.y) == j)
-                    {
-                        map.map[i][j].AnimalIn = true;
-                    }
-                    else
-                    {
-                        map.map[i][j].AnimalIn = false;
-                    }
-                }
-            }
-        }
-
+        GobieManager.MoveAnimals(map.map);
 
         map.days++;
 
-        map.MoveAnimal();
+        //.MoveAnimal();
         clearScreen();
         displayLittleTitle();
         map.displayMap();
@@ -872,6 +895,16 @@ void startGame() {
     clearScreen();
     srand((unsigned)time(NULL));
     map.startGeneration();
+
+    //Temp
+    GobieManager.AddAnimal();
+    GobieManager.AddAnimal();
+    GobieManager.AddAnimal();
+    GobieManager.AddAnimal();
+
+    BearManager.AddAnimal();
+    BearManager.AddAnimal();
+    BearManager.AddAnimal();
 
     while (!gameOver) {
         displayMenu();
