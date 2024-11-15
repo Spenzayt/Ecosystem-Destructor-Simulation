@@ -31,6 +31,10 @@ class Animals {
 protected:
     int x, y;
     string type;
+    int xmax = 10;
+    int ymax = 10;
+    int xmin = -10;
+    int ymin = -10;
 
 public:
     int food = 100;
@@ -45,13 +49,16 @@ public:
         return live;
     }
 
-    double distanceAvec(const Animals* autre) const {
-        return sqrt(pow(x - autre->x, 2) + pow(y - autre->y, 2));
+    int posx(Animals* autre) {
+        return x
+    }
+    int posy(Animals* autre) {
+        return y
     }
 
     void move(int dx, int dy) {
-        x = max(0, min(4, x + dx));
-        y = max(0, min(4, y + dy));
+        x += dx;
+        y += dy;
         cout << type << " se déplace en (" << x << ", " << y << ").\n";
     }
 
@@ -69,7 +76,7 @@ public:
     Loup() : Animals(rand() % 100, "Loup", true) {}
 
     void manger(Animals* autre)  {
-        if (autre && distanceAvec(autre) == 0 && autre->getType() == "Ours") {
+        if (autre->posx == x && autre->posy == y && autre->getType() == "Elephant") {
             autre->live = false;
             food += 10;
             cout << autre->getType() << " a été mangé par " << type << "!\n";
@@ -85,7 +92,7 @@ public:
     Ours() : Animals(rand() % 100, "Ours", true) {}
 
     void manger(Animals* autre)  {
-        if (autre && distanceAvec(autre) == 0 && autre->getType() == "Loup") {
+        if (autre->posx == x && autre->posy == y && && autre->getType() == "Aigle") {
             autre->live = false;
             food += 10;
             cout << autre->getType() << " a été mangé par " << type << "!\n";
@@ -97,7 +104,7 @@ public:
     Aigle() : Animals(rand() % 100, "Aigle", true) {}
 
     void manger(Animals* autre)  {
-        if (autre && distanceAvec(autre) == 0 && autre->getType() == "Loup") {
+        if (autre->posx == x && autre->posy == y && && autre->getType() == "Loup") {
             autre->live = false;
             food += 10;
             cout << autre->getType() << " a été mangé par " << type << "!\n";
@@ -109,8 +116,7 @@ public:
     Elephant() : Animals(rand() % 100, "Elephant", true) {}
 
     void manger(Animals* autre) override {
-        if (autre && distanceAvec(autre) == 0 && autre->getType() == "Loup") {
-            autre->live = false;
+        if (autre->posx == x && autre->posy == y && && autre->getType() == "Aigle") {
             food += 10;
             cout << autre->getType() << " a été mangé par " << type << "!\n";
         }
@@ -144,17 +150,23 @@ public:
 
     void tourDeJeu() {
         for (auto animal : animals) {
-            if (!animal->alive()) continue;
+            if (!animal->alive())  continue;
 
             int action = rand() % 2;
             switch (action) {
             case 0: // Déplacement
-                animal->move(rand() % 3 - 1, rand() % 3 - 1);
+                animal->move(rand() % -1+1, rand() % -1+1);
                 break;
             case 1: // Manger
                 for (auto& cible : animals) {
                     if (cible != animal && cible->alive()) {
+                        auto it = find(animals.begin(), animals.end(), animal);
+                        if (it != animals.end()) {
+                            delete* it;
+                            animals.erase(it);
+                        }
                         animal->manger(cible);
+
                         break;
                     }
                 }
@@ -162,18 +174,6 @@ public:
             }
         }
 
-        // Supprimer les animaux morts
-        animals.erase(
-            remove_if(animals.begin(), animals.end(),
-                [](Animals* animal) {
-                    if (!animal->alive()) {
-                        delete animal;
-                        return true;
-                    }
-                    return false;
-                }),
-            animals.end()
-        );
     }
 
     bool verifierVictoire() {
@@ -209,6 +209,7 @@ public:
     }
 
     void menu() {
+        
         while (true) {
             cout << "Que voulez-vous faire ?\n";
             cout << "1. Passer au jour suivant\n";
@@ -254,6 +255,7 @@ public:
 
         cout << "L'espèce " << especeGagnante << " a dominé la bataille royale!\n";
     }
+    
 };
 
 Jeu jeu;
