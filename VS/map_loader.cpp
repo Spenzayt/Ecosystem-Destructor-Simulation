@@ -1,4 +1,4 @@
-﻿#include "display_functions.h"
+#include "display_functions.h"
 
 #include <iostream>
 #include <cstdlib>
@@ -454,7 +454,6 @@ public:
 
 };
 
-
 Map map;
 
 struct Coordinates
@@ -464,7 +463,7 @@ struct Coordinates
 };
 
 class Animals {
-private:
+public:
     Coordinates coords;
     float orientation = rand() % 6;
     float age = 0;
@@ -474,18 +473,18 @@ private:
     int dailyEat;
     float speed;
     Biome type;
+    bool groupAnimal;
 
 
-public:
     Animals(
         Biome type,              // Définir le biome par défaut si nécessaire
         string specie,                // Nom de l'espèce
         int maxFood,                         // Quantité maximale de nourriture (peut être randomisé ailleurs)
         int dailyEat,                         // Quantité de nourriture consommée par jour
-        float speed = 1.0f                       // Vitesse de l'animal
+        float speed = 1.0f                     // Vitesse de l'animal
     ) :
         maxFood(maxFood),
-        currentFood(maxFood),                     // Initialise currentFood au maximum de nourriture disponiblex 
+        currentFood(maxFood),                     // Initialise currentFood au maximum de nourriture disponible
         specie(specie),
         dailyEat(dailyEat),
         speed(speed),
@@ -578,6 +577,15 @@ public:
         map[int(coords.x)][int(coords.y)].resource += -dailyEat;
 
     }
+
+    void CheckPositionDeath()
+    {
+        if (map.map[int(coords.x)][int(coords.y)].biome != type)
+        {
+        //detruire
+            setFood(0);
+        }
+    }
 };
 
 class SpecieManager
@@ -590,6 +598,7 @@ public:
     int maxFood;
     int dailyEat;
     float speed;
+    bool groupAnimal;
 
     SpecieManager(
         Tile(&mapp)[30][30], // Passage par référence
@@ -597,13 +606,15 @@ public:
         std::string specie,
         int maxFood,
         int dailyEat,
-        float speed = 1.0f
+        float speed = 1.0f,
+        bool _groupAnimal = false
     ) :
         type(type),
         specie(specie),
         maxFood(maxFood),
         dailyEat(dailyEat),
-        speed(speed)
+        speed(speed),
+        groupAnimal(_groupAnimal)
     {
         // Copie manuelle du tableau
         for (int i = 0; i < 30; ++i)
@@ -613,7 +624,15 @@ public:
 
     void AddAnimal()
     {
-        AnimalList.push_back(Animals(type, specie, maxFood, dailyEat, speed));
+        if (groupAnimal)
+        {
+            AnimalList.push_back(Animals(type, specie, maxFood, dailyEat, speed));
+        }
+        else
+        {
+            AnimalList.push_back(Animals(type, specie, maxFood, dailyEat, speed));
+        }
+        
     }
 
 
@@ -654,14 +673,169 @@ public:
             }
         }
     }
+
+    void CheckSpeciePositionDeath()
+    {
+        for (auto& animal : AnimalList)
+        {
+            animal.CheckPositionDeath();
+        }
+    }
 };
+
+class Gobie : public Animals
+{
+public:
+
+    Gobie(Biome _type, string _specie, int _maxFood, int _dailyEat, float _speed) : Animals(type = _type,
+        specie = _specie,
+        maxFood = _maxFood,
+        dailyEat = _dailyEat,
+        speed = _speed) {}
+
+
+    Coordinates GetGroupAverageCoords(std::vector<Animals> gobieList)
+    {
+        float x = 0;
+        float y = 0;
+        for (auto gobie : gobieList)
+        {
+            Coordinates coords = gobie.getCoords();
+            x += coords.x;
+            y += coords.y;
+        }
+        x = x / gobieList.size();
+        y = y / gobieList.size();
+        return Coordinates{ x, y };
+    }
+
+    Coordinates GetDirectionVector(Coordinates coordsA, Coordinates coordsB)
+    {
+        //TODO Rajouter un mutiplicateur par rapport a la distance ?
+        float dx = coordsB.x - coordsA.x;
+        float dy = coordsB.y - coordsA.y;
+
+        if (dx == 0 && dy == 0) {
+            return { 0.0f, 0.0f };
+        }
+
+        float angle = atan2(dy, dx); //angle en radians
+
+
+        float dirX = cos(angle);
+        float dirY = sin(angle);
+
+        return { dirX, dirY };
+    }
+
+    Coordinates GroupAttraction(std::vector<Animals> gobieList)
+    {
+        Coordinates coords = getCoords();
+
+        Coordinates direction = GetDirectionVector(coords, GetGroupAverageCoords(gobieList));
+
+        return direction;
+    }
+
+
+    float GetGroupAverageDir(std::vector<Animals> gobieList)
+    {
+        float dir = 0;
+        for (auto gobie : gobieList)
+        {
+            dir += gobie.GetDirection();
+        }
+        dir = dir / gobieList.size();
+        return dir;
+    }
+
+    Coordinates GetEntityCollisionMovement(Coordinates coordsA, Coordinates coordsB, float distTriggerMax)
+    {
+        //Get angle
+
+        float dx = coordsB.x - coordsA.x;
+        float dy = coordsB.y - coordsA.y;
+
+        float angle = atan2(dy, dx); //angle en radians
+
+        //Get Distance
+        float distance;
+
+        float multiplier = distTriggerMax - distance; // far -> less force
+        //TODO
+
+        float dirX = cos(angle) * multiplier;
+        float dirY = sin(angle) * multiplier;
+
+        return { dirX, dirY };
+        // direction == Lui vers moi
+
+    }
+
+    Coordinates GetGroupCollisionMovement(Coordinates coords, std::vector<Animals> gobieList, float distTriggerMax)
+    {
+        float totalX = 0;
+        float totalY = 0;
+        for (auto gobie : gobieList)
+        {
+            Coordinates movementCoordinates = GetEntityCollisionMovement(coords, gobie.getCoords(), distTriggerMax);
+            totalX += movementCoordinates.x;
+            totalY += movementCoordinates.y;
+        }
+        return { totalX, totalY };
+    }
+
+    void MoveGroupEffect(SpecieManager GobieManager)
+    {
+        float distTriggerMax = 1;
+        Coordinates GobieCoords = getCoords();
+        std::vector<Animals> InRangeGobieList = GobieManager.GetAnimalsArround(GobieCoords.x, GobieCoords.y, distTriggerMax);
+
+        //Exclude Himself
+        for (auto gobie : InRangeGobieList)
+        {
+            Coordinates gobieXY = gobie.getCoords();
+            if (gobieXY.x == GobieCoords.x && gobieXY.y == GobieCoords.y)
+            {
+                //TODO : Delete gobie from InRangeGobieList
+            }
+        }
+
+
+
+        // Group Attraction
+        Coordinates coords = getCoords();
+        Coordinates groupAttraction = GroupAttraction(InRangeGobieList);
+
+        coords = { coords.x + groupAttraction.x, coords.y + groupAttraction.y };
+
+
+        // Group Collision avoidance
+        Coordinates groupCollision = GetGroupCollisionMovement(GobieCoords, InRangeGobieList, distTriggerMax);
+
+        coords = { coords.x + groupCollision.x, coords.y + groupCollision.y };
+
+        SetCoords(coords.x, coords.y);
+
+
+        // Group Direction Alignement
+        float direction = GetDirection();
+        float averageDirection = GetGroupAverageDir(InRangeGobieList);
+
+        direction = direction * 0.9 + averageDirection * 0.1;
+
+    }
+};
+
 
 bool gameOver = false;
 
+
 // DEF SPECIES
-SpecieManager GobieManager = SpecieManager(map.map, WATER, "Gobie", 9, 5, 1.5f);
-SpecieManager BearManager = SpecieManager(map.map, GRASS, "Bear", 20, 10, 0.5f);
-SpecieManager SharkManager = SpecieManager(map.map, WATER, "Sharl", 10, 5, 2.5f);
+SpecieManager GobieManager = SpecieManager(map.map, WATER, "Gobie", 9, 5, 1.5f, true);
+SpecieManager SharkManager = SpecieManager(map.map, WATER, "Sharl", 10, 5, 2.5f, false);
+SpecieManager BearManager = SpecieManager(map.map, GRASS, "Bear", 20, 10, 1.0f, false);
+SpecieManager WolfManager = SpecieManager(map.map, GRASS, "Wolf", 10, 10, 4.0f, true);
 
 
 void drawSpecie(vector<SpecieManager> SpecieList)
@@ -688,7 +862,7 @@ void drawSpecie(vector<SpecieManager> SpecieList)
 
                     }
 
-                    map.map[i][j].AnimalIn.numberIn = counter;
+                    map.map[i][j].AnimalIn = counter;
 
 
                 }
@@ -752,11 +926,18 @@ void nextDay() {
                 map.map[i][j].resource += rand() % 1;
             }
         }
-
+        for (auto specie : { GobieManager, BearManager, WolfManager, SharkManager })
+        {
+            specie.CheckSpeciePositionDeath();
+            specie.MoveAnimals(map.map);
+            
+        }
         //AFFICHAGE
-        drawSpecie({ GobieManager, BearManager });
+        drawSpecie({GobieManager, BearManager, WolfManager, SharkManager});
 
-        GobieManager.MoveAnimals(map.map);
+        
+        
+        
 
         map.days++;
 
@@ -905,6 +1086,14 @@ void startGame() {
     BearManager.AddAnimal();
     BearManager.AddAnimal();
     BearManager.AddAnimal();
+
+    WolfManager.AddAnimal();
+    WolfManager.AddAnimal();
+    WolfManager.AddAnimal();
+
+    SharkManager.AddAnimal();
+    SharkManager.AddAnimal();
+    SharkManager.AddAnimal();
 
     while (!gameOver) {
         displayMenu();
