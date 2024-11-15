@@ -1,5 +1,4 @@
 ﻿#include "display_functions.h"
-
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
@@ -12,7 +11,11 @@
 
 using namespace std;
 
-// NEW
+
+const int MapSize = 30;
+const int MinResource = 20;
+const int MaxResource = 40;
+
 
 enum Biome {
     WATER,
@@ -27,30 +30,16 @@ enum Biome {
     BURNED,
 };
 
+
 struct Tile {
     Biome biome;
     int resource;
     bool AnimalIn;
 };
 
-const int MapSize = 30;
-const int MinResource = 20;
-const int MaxResource = 40;
-
-// Déclarations anticipées
-class SpecieManager;
-class Animals;
-
-vector<SpecieManager> SpeciesManager;
-
 
 class Map {
 public:
-
-    int animalX = 15;
-    int animalY = 15;
-
-
     int days = 1;
     Tile map[MapSize][MapSize];
     bool lakeGeneration = false;
@@ -58,7 +47,6 @@ public:
     Tile(*getMap())[MapSize] {
         return map;
     }
-
 
     // Flooding related variables.
     bool isFlooding = false;
@@ -84,7 +72,6 @@ public:
                 }
             }
         }
-        return Tiles;
     }
 
     void defaultMap() {
@@ -363,34 +350,8 @@ public:
         generateWater();
         generateResources();
         generateVolcano();
+        SpawnTest();
         displayMap();
-    }
-
-    int RandomRange(int min, int max) {
-        return rand() % (max - min + 1) + min;
-    }
-
-
-    void MoveAnimal() {
-        const int MAX_ATTEMPTS = 20;
-
-        for (int attempt = 0; attempt < MAX_ATTEMPTS; ++attempt) {
-            int offsetX = RandomRange(-3, 3);
-            int offsetY = RandomRange(-3, 3);
-
-            int newX = animalX + offsetX;
-            int newY = animalY + offsetY;
-            if (newX >= 0 && newX < MapSize && newY >= 0 && newY < MapSize) {
-                if (map[newX][newY].biome != WATER && !map[newX][newY].AnimalIn) {
-                    map[animalX][animalY].AnimalIn = false;
-                    map[newX][newY].AnimalIn = true;
-
-                    animalX = newX;
-                    animalY = newY;
-                    return;
-                }
-            }
-        }
     }
 
     void checkTile() {
@@ -437,6 +398,69 @@ public:
         cout << "Remaining resources: " << map[x][y].resource << endl;
     }
 
+    void nextDay() {
+        int daysToPass = 1;
+
+        while (true) {
+            clearScreen();
+            displayLittleTitle();
+            displayMap();
+            cout << "How many days do you want to pass ?" << endl;
+            cout << "Day to pass -> " << daysToPass;
+
+            char input = _getch();
+
+            if (input == 'z' || input == 'Z') {
+                daysToPass++;
+            }
+            else if (input == 's' || input == 'S') {
+                daysToPass--;
+            }
+            else if (input == 72) {
+                daysToPass++;
+            }
+            else if (input == 80) {
+                daysToPass--;
+            }
+            else if (input == 13) {
+                break;
+            }
+        }
+
+        for (int day = 0; day < daysToPass; day++) {
+            int x = (rand() % 99) + 1;
+            if (x <= 80) {
+            }
+            if (x > 80 && x < 90) {
+                StartFlooding();
+            }
+            if (x > 90) {
+                StartVolcano();
+            }
+            if (isFlooding) {
+                ContinueFlooding();
+            }
+            if (isUnFlooding) {
+                ContinueUnFlooding();
+            }
+            if (isErupting) {
+                PropagateLava();
+                LavaToRock();
+            }
+            for (int i = 0; i < MapSize; ++i) {
+                for (int j = 0; j < MapSize; ++j) {
+                    map[i][j].resource += 5;
+                }
+            }
+            days++;
+            clearScreen();
+            displayLittleTitle();
+            displayMap();
+            cout << endl << endl << endl;
+            centerText(to_string(day) + " days pass", true, 0);
+            this_thread::sleep_for(chrono::seconds(1));
+        }
+    }
     void nuke(int x, int y, int radius) {
         for (int dx = -radius; dx <= radius; ++dx) {
             for (int dy = -radius; dy <= radius; ++dy) {
@@ -463,290 +487,9 @@ public:
 
 };
 
-
-
-
-
-
 Map map;
 
-struct Coordinates
-{
-    float x;
-    float y;
-};
-
-class Animals {
-private:
-    Coordinates coords;
-    float orientation = rand() % 6;
-    float age = 0;
-    int maxFood;
-    int currentFood;
-    string specie; //TODO : definir ca pour chaque esp�ce
-    int dailyEat;
-    float speed;
-    Biome type;
-
-
-public:
-    Animals(
-        Biome type,              // Définir le biome par défaut si nécessaire
-        string specie,                // Nom de l'espèce
-        int maxFood,                         // Quantité maximale de nourriture (peut être randomisé ailleurs)
-        int dailyEat,                         // Quantité de nourriture consommée par jour
-        float speed = 1.0f                       // Vitesse de l'animal
-    ) :
-        maxFood(maxFood),
-        currentFood(maxFood),                     // Initialise currentFood au maximum de nourriture disponible
-        specie(specie),
-        dailyEat(dailyEat),
-        speed(speed),
-        type(type)
-
-    {
-        Map& mapp = map;
-        vector<pair<int, int>> goodTiles = map.getTiles(type);
-        pair<int, int> tile = goodTiles[int(rand() % goodTiles.size())];
-        coords.x = tile.first;
-        coords.y = tile.second;
-    }
-
-
-    Coordinates getCoords()
-    {
-        return coords;
-    }
-    void SetCoords(float x, float y)
-    {
-        coords.x = x;
-        coords.y = y;
-    }
-
-    float GetDirection()
-    {
-        return orientation;
-    }
-
-    void Move(Tile map[30][30])
-    {
-
-        currentFood += -1;
-
-        if (currentFood < 0.3f * maxFood) // Si il a moins de 33% de nourriture
-        {
-            if (map[int(coords.x)][int(coords.y)].resource > dailyEat) // Si y'a a manger
-            {
-                Eat(map);
-            }
-            else
-            {
-                int dx = round(cos(orientation));
-                int dy = round(sin(orientation));
-
-                if (map[int(coords.x) + dx][int(coords.y) + dy].resource > dailyEat) // Si la case devant lui a a manger, avancer
-                {
-                    coords.x += cos(orientation) * speed;
-                    coords.y += sin(orientation) * speed;
-                }
-
-                else
-                {
-                    orientation += 1; 
-                }
-            }
-        }
-        else
-        {
-            float randMovement = (float((rand() % 9) + 1) / 10);
-            coords.x += cos(orientation) * speed * randMovement;
-            coords.y += sin(orientation) * speed * randMovement;
-
-            orientation -= (float((rand() % 9) + 1) / 10);
-        }
-    }
-
-    void Eat(Tile map[30][30])
-    {
-        currentFood += dailyEat;
-        map[int(coords.x)][int(coords.y)].resource - dailyEat;
-
-    }
-};
-
-class SpecieManager
-{
-public:
-    std::vector<Animals> AnimalList;
-    Tile map[30][30];
-    Biome type;
-    std::string specie;
-    int maxFood;
-    int dailyEat;
-    float speed;
-
-    SpecieManager(
-        Tile(&mapp)[30][30], // Passage par référence
-        Biome type,
-        std::string specie,
-        int maxFood,
-        int dailyEat,
-        float speed = 1.0f
-    ) :
-        type(type),
-        specie(specie),
-        maxFood(maxFood),
-        dailyEat(dailyEat),
-        speed(speed)
-    {
-        // Copie manuelle du tableau
-        for (int i = 0; i < 30; ++i)
-            for (int j = 0; j < 30; ++j)
-                map[i][j] = mapp[i][j];
-    }
-
-    void AddAnimal()
-    {
-        AnimalList.push_back(Animals(type, specie, maxFood, dailyEat, speed));
-    }
-
-
-    int GetNumberAnimal()
-    {
-        int counter = 0;
-        for (auto animal : AnimalList)
-        {
-            counter += 1;
-        }
-        return counter;
-    }
-
-    vector<Animals> GetAnimalsArround(float x, float y, float radius = 1)
-    {
-        //return the number of animal of that specie arround a place, with a radius (by default radius = 1).
-        // Dans une zone carr�e
-        vector<Animals> closeList;
-        for (auto animal : AnimalList)
-        {
-            Coordinates animalCoords = animal.getCoords();
-            if ((animalCoords.x > x - radius && animalCoords.x < x + radius) &&
-                (animalCoords.y > y - radius && animalCoords.y < y + radius))
-            {
-                closeList.push_back(animal);
-            }
-        }
-        return closeList;
-    }
-
-    void MoveAnimals(Tile map[30][30]) {
-
-        for (auto animal : AnimalList) {
-            animal.Move(map);
-        }
-    }
-};
-
 bool gameOver = false;
-
-// DEF SPECIES
-SpecieManager GobieManager = SpecieManager(map.map, WATER, "Gobie", 3, 1, 1.0f);
-SpecieManager SharkManager = SpecieManager(map.map, WATER, "Sharl", 10, 5, 2.5f);
-
-
-
-void nextDay() {
-    int daysToPass = 1;
-
-    while (true) {
-        clearScreen();
-        displayLittleTitle();
-        map.displayMap();
-        cout << "How many days do you want to pass ?" << endl;
-        cout << "Day to pass -> " << daysToPass;
-
-        char input = _getch();
-
-        if (input == 'z' || input == 'Z') {
-            daysToPass++;
-        }
-        else if (input == 's' || input == 'S') {
-            daysToPass--;
-        }
-        else if (input == 72) {
-            daysToPass++;
-        }
-        else if (input == 80) {
-            daysToPass--;
-        }
-        else if (input == 13) {
-            break;
-        }
-    }
-
-    for (int day = 0; day < daysToPass; day++) {
-        int x = (rand() % 99) + 1;
-        if (x <= 80) {
-        }
-        if (x > 80 && x < 90) {
-            map.StartFlooding();
-        }
-        if (x > 90) {
-            map.StartVolcano();
-        }
-        if (map.isFlooding) {
-            map.ContinueFlooding();
-        }
-        if (map.isUnFlooding) {
-            map.ContinueUnFlooding();
-        }
-        if (map.isErupting) {
-            map.PropagateLava();
-            map.LavaToRock();
-        }
-        for (int i = 0; i < MapSize; ++i) {
-            for (int j = 0; j < MapSize; ++j) {
-                map.map[i][j].resource += 5;
-            }
-        }
-
-        GobieManager.AddAnimal();
-        vector<Coordinates> AnimalInCoords;
-        for (auto animal : GobieManager.AnimalList) // pour chaque animal check ou il est et le rajouter a AnimalIn
-        {
-            AnimalInCoords.push_back(animal.getCoords());
-        }
-
-        for (int i = 0; i < 30; i++)
-        {
-            for (int j = 0; j < 30; j++)
-            {
-                for (Coordinates coords : AnimalInCoords)
-                {
-                    if (int(coords.x) == i && int(coords.y) == j)
-                    {
-                        map.map[i][j].AnimalIn = true;
-                    }
-                    else
-                    {
-                        map.map[i][j].AnimalIn = false;
-                    }
-                }
-            }
-        }
-
-
-        map.days++;
-
-        map.MoveAnimal();
-        clearScreen();
-        displayLittleTitle();
-        map.displayMap();
-        cout << endl << endl << endl;
-        centerText(to_string(day) + " days pass", true, 0);
-        this_thread::sleep_for(chrono::seconds(1));
-
-    }
-}
 
 enum Key {
     INVALID = -1, UP, DOWN, LEFT, RIGHT, SPACE = 32, ENTER = 13, Z = 'z', S = 's', A = 'a', B = 'b'
@@ -843,7 +586,7 @@ void displayMenu() {
         }
         else if (input == SPACE || input == ENTER) {
             if (choice == 1) {
-                nextDay();
+                map.nextDay();
             }
             else if (choice == 2) {
                 map.checkTile();
@@ -854,11 +597,11 @@ void displayMenu() {
             }
             else if (choice == 4) {
                 map.StartFlooding();
-                nextDay();
+                map.nextDay();
             }
             else if (choice == 5) {
                 map.StartVolcano();
-                nextDay();
+                map.nextDay();
             }
             else if (choice == 6) {
                 map.nuke(15, 15, 16);
@@ -868,7 +611,6 @@ void displayMenu() {
 }
 
 void startGame() {
-
     clearScreen();
     srand((unsigned)time(NULL));
     map.startGeneration();
