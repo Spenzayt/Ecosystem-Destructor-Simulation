@@ -6,6 +6,8 @@
 
 - Created in 1 week by 4 people.
 
+![image](https://github.com/user-attachments/assets/4f3616d5-3a04-4645-96de-80117c9e3a32)
+
 ---
 
 ## Features
