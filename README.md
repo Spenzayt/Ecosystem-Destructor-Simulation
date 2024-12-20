@@ -3,7 +3,8 @@
 ## Overview
 
 **Ecosystem Destructor** is a C++ console-based simulation where you manage an ecosystem that evolves day by day. You can check specific cells, observe resource changes, and deal with random events like volcanic eruptions and flooding. The game also includes a **Cheat Menu** accessed via the Konami Code, which lets you trigger disasters or even nuke the map.
-- Create in 1 week (by me and three other person)
+
+- Created in 1 weeks by 4 people.
 
 ---
 
